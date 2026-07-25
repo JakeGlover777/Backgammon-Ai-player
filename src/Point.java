@@ -48,4 +48,18 @@ public class Point
             );
         }
     }
+
+    public void removeChecker()
+    {
+        if(isEmpty())
+        {
+            throw new IllegalStateException("Cannot remove a checker from an empty point.");
+        }
+        checkerCount --;
+
+        if(checkerCount == 0 )
+        {
+            owner = Player.NONE;
+        }
+    }
 }
