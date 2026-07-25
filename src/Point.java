@@ -62,4 +62,15 @@ public class Point
             owner = Player.NONE;
         }
     }
+
+    @Override
+    public String toString()
+    {
+        if (isEmpty())
+        {
+            return "Empty";
+        }
+
+        return owner + " x" + checkerCount;
+    }
 }
