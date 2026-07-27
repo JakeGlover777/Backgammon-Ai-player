@@ -2,22 +2,14 @@ public class Main
 {
     public static void main(String[] args)
     {
+        Game game = new Game();
 
-        Board board = new Board();
-        board.printBoard();
+        System.out.println(game.getCurrentPlayer());
 
+        game.switchPlayer();
+        System.out.println(game.getCurrentPlayer());
 
-        Dice dice = new Dice();
-
-        for (int i = 0; i < 10; i++)
-        {
-            dice.roll();
-            System.out.println(dice);
-
-            if (dice.isDouble())
-            {
-                System.out.println("Double rolled!");
-            }
-        }
+        game.switchPlayer();
+        System.out.println(game.getCurrentPlayer());
     }
 }
