@@ -26,6 +26,45 @@ public class MoveGenerator
             {
                 int destinationOne = i + (dice.getDieOne() * direction);
                 int destinationTwo = i + (dice.getDieTwo() * direction);
+
+                if (isOnBoard(destinationOne))
+                {
+                    Point destination = board.getPoint(destinationOne);
+
+                    if (destination.isEmpty()
+                            || destination.getOwner() == player
+                            || (destination.getOwner() != player
+                            && destination.getCheckerCount() == 1))
+                    {
+                        moves.add(new Move(
+                                player,
+                                i,
+                                destinationOne,
+                                dice.getDieOne()
+                        ));
+                    }
+                }
+
+                if (dice.getDieTwo() != dice.getDieOne())
+                {
+                    if (isOnBoard(destinationTwo))
+                    {
+                        Point destination = board.getPoint(destinationTwo);
+
+                        if (destination.isEmpty()
+                                || destination.getOwner() == player
+                                || (destination.getOwner() != player
+                                && destination.getCheckerCount() == 1))
+                        {
+                            moves.add(new Move(
+                                    player,
+                                    i,
+                                    destinationTwo,
+                                    dice.getDieTwo()
+                            ));
+                        }
+                    }
+                }
             }
         }
 

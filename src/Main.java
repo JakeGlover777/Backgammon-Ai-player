@@ -1,15 +1,23 @@
+import java.util.List;
+
 public class Main
 {
     public static void main(String[] args)
     {
-        Game game = new Game();
+        Board board = new Board();
 
-        System.out.println(game.getCurrentPlayer());
+        Dice dice = new Dice();
+        dice.roll();
 
-        game.switchPlayer();
-        System.out.println(game.getCurrentPlayer());
+        MoveGenerator generator = new MoveGenerator();
 
-        game.switchPlayer();
-        System.out.println(game.getCurrentPlayer());
+        List<Move> moves = generator.generateMoves(board, Player.WHITE, dice);
+
+        System.out.println(dice);
+
+        for (Move move : moves)
+        {
+            System.out.println(move);
+        }
     }
 }
