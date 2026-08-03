@@ -6,18 +6,10 @@ public class Main
     {
         Board board = new Board();
 
-        Dice dice = new Dice();
-        dice.roll();
+        Move move = new Move(Player.WHITE, 0, 1, 1);
 
-        MoveGenerator generator = new MoveGenerator();
+        board.applyMove(move);
 
-        List<Move> moves = generator.generateMoves(board, Player.WHITE, dice);
-
-        System.out.println(dice);
-
-        for (Move move : moves)
-        {
-            System.out.println(move);
-        }
+        board.printBoard();
     }
 }

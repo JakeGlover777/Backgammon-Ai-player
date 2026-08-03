@@ -53,4 +53,13 @@ public class Board
             System.out.println("Point " + i + ": " + points[i]);
         }
     }
+
+    public void applyMove(Move move)
+    {
+        Point source = getPoint(move.getFromPoint());
+        Point destination = getPoint(move.getToPoint());
+
+        source.removeChecker();
+        destination.addChecker(move.getPlayer());
+    }
 }
