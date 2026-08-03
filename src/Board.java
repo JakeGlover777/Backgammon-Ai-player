@@ -2,6 +2,8 @@ public class Board
 {
     private static final int BOARD_SIZE = 24;
     private final Point[] points;
+    private int whiteCheckersOnBar;
+    private int blackCheckersOnBar;
 
     public Board()
     {
@@ -10,8 +12,10 @@ public class Board
         for (int i = 0; i < BOARD_SIZE; i++)
         {
             points[i] = new Point();
+
         }
         setUpStartingPosition();
+        
     }
     public Point getPoint(int index)
     {
@@ -54,12 +58,44 @@ public class Board
         }
     }
 
+    private void addToBar(Player player)
+    {
+        if (player == Player.WHITE)
+        {
+            whiteCheckersOnBar++;
+        }
+        else if (player == Player.BLACK)
+        {
+            blackCheckersOnBar++;
+        }
+    }
+
     public void applyMove(Move move)
     {
         Point source = getPoint(move.getFromPoint());
         Point destination = getPoint(move.getToPoint());
 
         source.removeChecker();
+
+        if (!destination.isEmpty()
+                && destination.getOwner() != move.getPlayer()
+                && destination.getCheckerCount() == 1)
+        {
+            Player hitPlayer = destination.getOwner();
+            destination.removeChecker();
+            addToBar(hitPlayer);
+        }
+
         destination.addChecker(move.getPlayer());
+    }
+
+    public int getWhiteBarCount()
+    {
+        return whiteCheckersOnBar;
+    }
+
+    public int getBlackBarCount()
+    {
+        return blackCheckersOnBar;
     }
 }
