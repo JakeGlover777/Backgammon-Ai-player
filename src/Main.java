@@ -4,34 +4,13 @@ public class Main
     {
         Board board = new Board();
 
-        board.getPoint(1).addChecker(Player.BLACK);
+        Move move = new Move(Player.WHITE, 18, 6);
 
-        Move hitMove = new Move(
-                Player.WHITE,
-                0,
-                1,
-                1
-        );
-
-        board.applyMove(hitMove);
+        board.applyMove(move);
 
         System.out.println(
-                "Black bar before entry: "
-                        + board.getBarCount(Player.BLACK)
-        );
-
-        Move entryMove = new Move(
-                Player.BLACK,
-                22,
-                2,
-                true
-        );
-
-        board.applyMove(entryMove);
-
-        System.out.println(
-                "Black bar after entry: "
-                        + board.getBarCount(Player.BLACK)
+                "White borne off: "
+                        + board.getBorneOffCount(Player.WHITE)
         );
 
         board.printBoard();

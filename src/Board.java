@@ -4,10 +4,17 @@ public class Board
 
     private final Point[] points;
 
+    private int whiteCheckersBorneOff;
+    private int blackCheckersBorneOff;
     private int whiteCheckersOnBar;
     private int blackCheckersOnBar;
 
     public Board()
+    {
+        this(true);
+    }
+
+    public Board(boolean useStartingPosition)
     {
         points = new Point[BOARD_SIZE];
 
@@ -19,7 +26,13 @@ public class Board
         whiteCheckersOnBar = 0;
         blackCheckersOnBar = 0;
 
-        setUpStartingPosition();
+        whiteCheckersBorneOff = 0;
+        blackCheckersBorneOff = 0;
+
+        if (useStartingPosition)
+        {
+            setUpStartingPosition();
+        }
     }
 
     public Point getPoint(int index)
@@ -85,8 +98,73 @@ public class Board
         );
     }
 
+    public int getBorneOffCount(Player player)
+    {
+        if (player == Player.WHITE)
+        {
+            return whiteCheckersBorneOff;
+        }
+
+        if (player == Player.BLACK)
+        {
+            return blackCheckersBorneOff;
+        }
+
+        throw new IllegalArgumentException(
+                "Player must be WHITE or BLACK."
+        );
+    }
+
+    public boolean allCheckersInHomeBoard(Player player)
+    {
+        if (getBarCount(player) > 0)
+        {
+            return false;
+        }
+
+        if (player == Player.WHITE)
+        {
+            for (int i = 0; i < 18; i++)
+            {
+                if (points[i].getOwner() == Player.WHITE)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        if (player == Player.BLACK)
+        {
+            for (int i = 6; i < BOARD_SIZE; i++)
+            {
+                if (points[i].getOwner() == Player.BLACK)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        throw new IllegalArgumentException(
+                "Player must be WHITE or BLACK."
+        );
+    }
+
     public void applyMove(Move move)
     {
+        if (move.isBearingOff())
+        {
+            Point source = getPoint(move.getFromPoint());
+
+            source.removeChecker();
+            addBorneOffChecker(move.getPlayer());
+
+            return;
+        }
+
         Point destination = getPoint(move.getToPoint());
 
         if (move.isEnteringFromBar())
@@ -131,6 +209,24 @@ public class Board
         else if (player == Player.BLACK)
         {
             blackCheckersOnBar++;
+        }
+        else
+        {
+            throw new IllegalArgumentException(
+                    "Player must be WHITE or BLACK."
+            );
+        }
+    }
+
+    private void addBorneOffChecker(Player player)
+    {
+        if (player == Player.WHITE)
+        {
+            whiteCheckersBorneOff++;
+        }
+        else if (player == Player.BLACK)
+        {
+            blackCheckersBorneOff++;
         }
         else
         {

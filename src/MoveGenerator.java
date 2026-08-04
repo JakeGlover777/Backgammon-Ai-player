@@ -71,20 +71,50 @@ public class MoveGenerator
                         );
                     }
                 }
-
-                if (dice.getDieTwo() != dice.getDieOne()
-                        && isOnBoard(destinationTwo))
+                else if (canBearOff(
+                        board,
+                        player,
+                        i,
+                        dice.getDieOne()))
                 {
-                    Point destination =
-                            board.getPoint(destinationTwo);
+                    moves.add(
+                            new Move(
+                                    player,
+                                    i,
+                                    dice.getDieOne()
+                            )
+                    );
+                }
 
-                    if (isLegalDestination(destination, player))
+                if (dice.getDieTwo() != dice.getDieOne())
+                {
+                    if (isOnBoard(destinationTwo))
+                    {
+                        Point destination =
+                                board.getPoint(destinationTwo);
+
+                        if (isLegalDestination(destination, player))
+                        {
+                            moves.add(
+                                    new Move(
+                                            player,
+                                            i,
+                                            destinationTwo,
+                                            dice.getDieTwo()
+                                    )
+                            );
+                        }
+                    }
+                    else if (canBearOff(
+                            board,
+                            player,
+                            i,
+                            dice.getDieTwo()))
                     {
                         moves.add(
                                 new Move(
                                         player,
                                         i,
-                                        destinationTwo,
                                         dice.getDieTwo()
                                 )
                         );
@@ -137,6 +167,67 @@ public class MoveGenerator
                 || destination.getOwner() == player
                 || (destination.getOwner() != player
                 && destination.getCheckerCount() == 1);
+    }
+
+    private boolean canBearOff(
+            Board board,
+            Player player,
+            int fromPoint,
+            int dieValue)
+    {
+        if (!board.allCheckersInHomeBoard(player))
+        {
+            return false;
+        }
+
+        int exactDieRequired;
+
+        if (player == Player.WHITE)
+        {
+            exactDieRequired = BOARD_SIZE - fromPoint;
+
+            if (dieValue == exactDieRequired)
+            {
+                return true;
+            }
+
+            if (dieValue > exactDieRequired)
+            {
+                for (int i = 18; i < fromPoint; i++)
+                {
+                    if (board.getPoint(i).getOwner() == player)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+        else
+        {
+            exactDieRequired = fromPoint + 1;
+
+            if (dieValue == exactDieRequired)
+            {
+                return true;
+            }
+
+            if (dieValue > exactDieRequired)
+            {
+                for (int i = 5; i > fromPoint; i--)
+                {
+                    if (board.getPoint(i).getOwner() == player)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean isOnBoard(int index)
