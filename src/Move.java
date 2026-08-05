@@ -34,7 +34,7 @@ public class Move
         if (!enteringFromBar)
         {
             throw new IllegalArgumentException(
-                    "This constructor is only for bar-entry moves."
+                    "This is only for bar-entry moves."
             );
         }
 

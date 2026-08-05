@@ -11,21 +11,11 @@ public class MoveGenerator
 
         if (board.getBarCount(player) > 0)
         {
-            generateBarEntryMove(
-                    moves,
-                    board,
-                    player,
-                    dice.getDieOne()
-            );
+            generateBarEntryMove(moves, board, player, dice.getDieOne());
 
             if (dice.getDieTwo() != dice.getDieOne())
             {
-                generateBarEntryMove(
-                        moves,
-                        board,
-                        player,
-                        dice.getDieTwo()
-                );
+                generateBarEntryMove(moves, board, player, dice.getDieTwo());
             }
 
             return moves;
@@ -62,27 +52,16 @@ public class MoveGenerator
                     if (isLegalDestination(destination, player))
                     {
                         moves.add(
-                                new Move(
-                                        player,
-                                        i,
-                                        destinationOne,
+                                new Move(player, i, destinationOne,
                                         dice.getDieOne()
                                 )
                         );
                     }
                 }
-                else if (canBearOff(
-                        board,
-                        player,
-                        i,
-                        dice.getDieOne()))
+                else if (canBearOff(board, player, i, dice.getDieOne()))
                 {
                     moves.add(
-                            new Move(
-                                    player,
-                                    i,
-                                    dice.getDieOne()
-                            )
+                            new Move(player, i, dice.getDieOne())
                     );
                 }
 
@@ -96,27 +75,14 @@ public class MoveGenerator
                         if (isLegalDestination(destination, player))
                         {
                             moves.add(
-                                    new Move(
-                                            player,
-                                            i,
-                                            destinationTwo,
-                                            dice.getDieTwo()
-                                    )
+                                    new Move(player, i, destinationTwo, dice.getDieTwo())
                             );
                         }
                     }
-                    else if (canBearOff(
-                            board,
-                            player,
-                            i,
-                            dice.getDieTwo()))
+                    else if (canBearOff(board, player, i, dice.getDieTwo()))
                     {
                         moves.add(
-                                new Move(
-                                        player,
-                                        i,
-                                        dice.getDieTwo()
-                                )
+                                new Move(player, i, dice.getDieTwo())
                         );
                     }
                 }
@@ -126,11 +92,8 @@ public class MoveGenerator
         return moves;
     }
 
-    private void generateBarEntryMove(
-            List<Move> moves,
-            Board board,
-            Player player,
-            int dieValue)
+    private void generateBarEntryMove(List<Move> moves, Board board,
+            Player player, int dieValue)
     {
         int destination;
 
@@ -149,12 +112,7 @@ public class MoveGenerator
         if (isLegalDestination(destinationPoint, player))
         {
             moves.add(
-                    new Move(
-                            player,
-                            destination,
-                            dieValue,
-                            true
-                    )
+                    new Move(player, destination, dieValue, true)
             );
         }
     }

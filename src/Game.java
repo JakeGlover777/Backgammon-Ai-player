@@ -1,4 +1,3 @@
-
 public class Game
 {
     private final Board board;
@@ -8,10 +7,8 @@ public class Game
     public Game()
     {
         this.board = new Board();
-        this.dice  = new Dice();
+        this.dice = new Dice();
         this.currentPlayer = Player.WHITE;
-
-
     }
 
     public Board getBoard()
@@ -31,7 +28,7 @@ public class Game
 
     public void switchPlayer()
     {
-        if(currentPlayer == Player.WHITE)
+        if (currentPlayer == Player.WHITE)
         {
             currentPlayer = Player.BLACK;
         }
@@ -41,4 +38,18 @@ public class Game
         }
     }
 
+    public Player getWinner()
+    {
+        if (board.getBorneOffCount(Player.WHITE) == 15)
+        {
+            return Player.WHITE;
+        }
+
+        if (board.getBorneOffCount(Player.BLACK) == 15)
+        {
+            return Player.BLACK;
+        }
+
+        return Player.NONE;
+    }
 }
