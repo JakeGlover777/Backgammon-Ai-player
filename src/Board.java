@@ -259,4 +259,19 @@ public class Board
         placeCheckers(7, Player.BLACK, 3);
         placeCheckers(5, Player.BLACK, 5);
     }
+
+    public Board(Board other)
+    {
+        points = new Point[BOARD_SIZE];
+
+        for (int i = 0; i < BOARD_SIZE; i++)
+        {
+            points[i] = new Point(other.points[i]);
+        }
+
+        this.whiteCheckersOnBar = other.whiteCheckersOnBar;
+        this.blackCheckersOnBar = other.blackCheckersOnBar;
+        this.whiteCheckersBorneOff = other.whiteCheckersBorneOff;
+        this.blackCheckersBorneOff = other.blackCheckersBorneOff;
+    }
 }

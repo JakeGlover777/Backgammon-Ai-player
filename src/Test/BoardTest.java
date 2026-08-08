@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BoardTest
@@ -58,5 +59,22 @@ public class BoardTest
 
         assertEquals(1, board.getBorneOffCount(Player.WHITE));
         assertTrue(board.getPoint(23).isEmpty());
+    }
+
+    @Test
+    void shouldCreateIndependentBoardCopy()
+    {
+        Board original = new Board();
+        Board copy = new Board(original);
+
+        Move move = new Move(Player.WHITE, 0, 1, 1);
+
+        copy.applyMove(move);
+
+        assertEquals(2, original.getPoint(0).getCheckerCount());
+        assertTrue(original.getPoint(1).isEmpty());
+
+        assertEquals(1, copy.getPoint(0).getCheckerCount());
+        assertEquals(1, copy.getPoint(1).getCheckerCount());
     }
 }

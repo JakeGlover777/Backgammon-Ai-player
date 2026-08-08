@@ -73,4 +73,10 @@ public class Point
 
         return owner + " x" + checkerCount;
     }
+
+    public Point(Point other)
+    {
+        this.owner = other.owner;
+        this.checkerCount = other.checkerCount;
+    }
 }
