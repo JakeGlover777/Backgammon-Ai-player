@@ -11,6 +11,11 @@ public class MoveSequence
         this.moves = new ArrayList<>();
     }
 
+    public MoveSequence(MoveSequence other)
+    {
+        this.moves = new ArrayList<>(other.moves);
+    }
+
     public void addMove(Move move)
     {
         moves.add(move);

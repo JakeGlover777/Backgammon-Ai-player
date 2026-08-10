@@ -39,4 +39,11 @@ public class Dice
     {
         return "Die 1: " + dieOne + " | Die 2: " + dieTwo;
     }
+
+    public Dice(int dieOne, int dieTwo)
+    {
+        this.random = new Random();
+        this.dieOne = dieOne;
+        this.dieTwo = dieTwo;
+    }
 }
