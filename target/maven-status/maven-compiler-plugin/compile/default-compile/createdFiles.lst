@@ -1,0 +1,17 @@
+game/Main.class
+game/Dice.class
+game/PlayerType.class
+game/Checker.class
+game/MoveSequence.class
+ai/HeuristicAi.class
+game/Move.class
+game/Game.class
+game/Player.class
+ai/AiPlayer.class
+game/MoveGenerator.class
+ai/RandomAi.class
+game/Board.class
+ai/ExpectimaxAi.class
+game/Point.class
+game/GameState.class
+ui/GameUi.class

@@ -1,0 +1,17 @@
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/ai/AiPlayer.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/ai/ExpectimaxAi.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/ai/HeuristicAi.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/ai/RandomAi.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/game/Board.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/game/Checker.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/game/Dice.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/game/Game.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/game/GameState.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/game/Main.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/game/Move.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/game/MoveGenerator.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/game/MoveSequence.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/game/Player.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/game/PlayerType.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/game/Point.java
+/Users/jakeglover/Documents/main/Backgammon Ai player/src/main/java/ui/GameUi.java

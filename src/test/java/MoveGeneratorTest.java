@@ -1,6 +1,13 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import game.Board;
+import game.Dice;
+import game.Move;
+import game.MoveGenerator;
+import game.MoveSequence;
+import game.Player;
+
 import org.junit.jupiter.api.Test;
 import java.util.List;
 

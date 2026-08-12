@@ -1,3 +1,5 @@
+package game;
+
 public class Board
 {
     private static final int BOARD_SIZE = 24;
@@ -40,7 +42,7 @@ public class Board
         if (index < 0 || index >= BOARD_SIZE)
         {
             throw new IllegalArgumentException(
-                    "Point index must be between 0 and "
+                    "Main.Point index must be between 0 and "
                             + (BOARD_SIZE - 1) + "."
             );
         }
@@ -61,7 +63,7 @@ public class Board
         }
 
         throw new IllegalArgumentException(
-                "Player must be WHITE or BLACK."
+                "Main.Player must be WHITE or BLACK."
         );
     }
 
@@ -94,7 +96,7 @@ public class Board
         }
 
         throw new IllegalArgumentException(
-                "Player must be WHITE or BLACK."
+                "Main.Player must be WHITE or BLACK."
         );
     }
 
@@ -111,7 +113,7 @@ public class Board
         }
 
         throw new IllegalArgumentException(
-                "Player must be WHITE or BLACK."
+                "Main.Player must be WHITE or BLACK."
         );
     }
 
@@ -149,7 +151,7 @@ public class Board
         }
 
         throw new IllegalArgumentException(
-                "Player must be WHITE or BLACK."
+                "Main.Player must be WHITE or BLACK."
         );
     }
 
@@ -195,7 +197,7 @@ public class Board
         for (int i = 0; i < BOARD_SIZE; i++)
         {
             System.out.println(
-                    "Point " + i + ": " + points[i]
+                    "Main.Point " + i + ": " + points[i]
             );
         }
     }
@@ -213,7 +215,7 @@ public class Board
         else
         {
             throw new IllegalArgumentException(
-                    "Player must be WHITE or BLACK."
+                    "Main.Player must be WHITE or BLACK."
             );
         }
     }
@@ -231,7 +233,7 @@ public class Board
         else
         {
             throw new IllegalArgumentException(
-                    "Player must be WHITE or BLACK."
+                    "Main.Player must be WHITE or BLACK."
             );
         }
     }

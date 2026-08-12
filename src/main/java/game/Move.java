@@ -1,3 +1,5 @@
+package game;
+
 public class Move
 {
     private static final int SPECIAL_POINT = -1;
