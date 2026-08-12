@@ -4,6 +4,7 @@ game/PlayerType.class
 game/Checker.class
 game/MoveSequence.class
 ai/HeuristicAi.class
+ui/BoardView.class
 game/Move.class
 game/Game.class
 game/Player.class
