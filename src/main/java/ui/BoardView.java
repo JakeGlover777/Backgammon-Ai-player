@@ -9,6 +9,10 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Consumer;
+
 public class BoardView extends Pane
 {
     private static final double BOARD_WIDTH = 800;
@@ -23,11 +27,45 @@ public class BoardView extends Pane
 
     private final Board board;
 
+    private Consumer<Integer> pointClickHandler;
+
+    private final Set<Integer> highlightedPoints =
+            new HashSet<>();
+
     public BoardView(Board board)
     {
         this.board = board;
 
-        setPrefSize(BOARD_WIDTH, BOARD_HEIGHT);
+        setPrefSize(
+                BOARD_WIDTH,
+                BOARD_HEIGHT
+        );
+
+        drawBoard();
+    }
+
+    public void refresh()
+    {
+        drawBoard();
+    }
+
+    public void setOnPointClicked(
+            Consumer<Integer> handler)
+    {
+        this.pointClickHandler = handler;
+    }
+
+    public void highlightPoints(Set<Integer> points)
+    {
+        highlightedPoints.clear();
+        highlightedPoints.addAll(points);
+
+        drawBoard();
+    }
+
+    public void clearHighlights()
+    {
+        highlightedPoints.clear();
 
         drawBoard();
     }
@@ -55,7 +93,8 @@ public class BoardView extends Pane
     private void drawBar()
     {
         double barX =
-                (BOARD_WIDTH / 2) - (BAR_WIDTH / 2);
+                (BOARD_WIDTH / 2)
+                        - (BAR_WIDTH / 2);
 
         Rectangle bar = new Rectangle(
                 barX,
@@ -71,37 +110,67 @@ public class BoardView extends Pane
 
     private void drawPoints()
     {
-        for (int pointIndex = 0; pointIndex < 24; pointIndex++)
+        for (int pointIndex = 0;
+             pointIndex < 24;
+             pointIndex++)
         {
-            double x = getPointX(pointIndex);
+            double x =
+                    getPointX(pointIndex);
+
+            Polygon triangle;
 
             if (isTopPoint(pointIndex))
             {
-                drawTopPoint(x, pointIndex);
+                triangle =
+                        createTopPoint(
+                                x,
+                                pointIndex
+                        );
             }
             else
             {
-                drawBottomPoint(x, pointIndex);
+                triangle =
+                        createBottomPoint(
+                                x,
+                                pointIndex
+                        );
             }
+
+            final int clickedPoint =
+                    pointIndex;
+
+            triangle.setOnMouseClicked(event ->
+                    handlePointClick(clickedPoint)
+            );
+
+            getChildren().add(triangle);
         }
     }
 
-    private void drawTopPoint(double x, int index)
+    private Polygon createTopPoint(
+            double x,
+            int index)
     {
         Polygon triangle = new Polygon();
 
         triangle.getPoints().addAll(
                 x, 0.0,
                 x + POINT_WIDTH, 0.0,
-                x + (POINT_WIDTH / 2), POINT_HEIGHT
+                x + (POINT_WIDTH / 2),
+                POINT_HEIGHT
         );
 
-        triangle.setFill(getPointColor(index));
+        stylePoint(
+                triangle,
+                index
+        );
 
-        getChildren().add(triangle);
+        return triangle;
     }
 
-    private void drawBottomPoint(double x, int index)
+    private Polygon createBottomPoint(
+            double x,
+            int index)
     {
         Polygon triangle = new Polygon();
 
@@ -112,16 +181,46 @@ public class BoardView extends Pane
                 BOARD_HEIGHT - POINT_HEIGHT
         );
 
-        triangle.setFill(getPointColor(index));
+        stylePoint(
+                triangle,
+                index
+        );
 
-        getChildren().add(triangle);
+        return triangle;
+    }
+
+    private void stylePoint(
+            Polygon triangle,
+            int index)
+    {
+        if (highlightedPoints.contains(index))
+        {
+            triangle.setFill(
+                    Color.GOLD
+            );
+
+            triangle.setStroke(
+                    Color.YELLOW
+            );
+
+            triangle.setStrokeWidth(4);
+        }
+        else
+        {
+            triangle.setFill(
+                    getPointColor(index)
+            );
+        }
     }
 
     private void drawCheckers()
     {
-        for (int pointIndex = 0; pointIndex < 24; pointIndex++)
+        for (int pointIndex = 0;
+             pointIndex < 24;
+             pointIndex++)
         {
-            Point point = board.getPoint(pointIndex);
+            Point point =
+                    board.getPoint(pointIndex);
 
             if (point.isEmpty())
             {
@@ -129,7 +228,8 @@ public class BoardView extends Pane
             }
 
             for (int checkerIndex = 0;
-                 checkerIndex < point.getCheckerCount();
+                 checkerIndex
+                         < point.getCheckerCount();
                  checkerIndex++)
             {
                 drawChecker(
@@ -155,13 +255,15 @@ public class BoardView extends Pane
         if (isTopPoint(pointIndex))
         {
             y = CHECKER_RADIUS
-                    + (checkerIndex * CHECKER_SPACING);
+                    + (checkerIndex
+                    * CHECKER_SPACING);
         }
         else
         {
             y = BOARD_HEIGHT
                     - CHECKER_RADIUS
-                    - (checkerIndex * CHECKER_SPACING);
+                    - (checkerIndex
+                    * CHECKER_SPACING);
         }
 
         Circle checker = new Circle(
@@ -183,15 +285,35 @@ public class BoardView extends Pane
 
         checker.setStrokeWidth(2);
 
+        final int clickedPoint =
+                pointIndex;
+
+        checker.setOnMouseClicked(event ->
+                handlePointClick(clickedPoint)
+        );
+
         getChildren().add(checker);
     }
 
-    private boolean isTopPoint(int pointIndex)
+    private void handlePointClick(
+            int pointIndex)
+    {
+        if (pointClickHandler != null)
+        {
+            pointClickHandler.accept(
+                    pointIndex
+            );
+        }
+    }
+
+    private boolean isTopPoint(
+            int pointIndex)
     {
         return pointIndex >= 12;
     }
 
-    private double getPointX(int pointIndex)
+    private double getPointX(
+            int pointIndex)
     {
         int position;
 
@@ -200,36 +322,44 @@ public class BoardView extends Pane
             position = pointIndex;
 
             return 20
-                    + (position * POINT_WIDTH);
+                    + (position
+                    * POINT_WIDTH);
         }
 
         if (pointIndex < 12)
         {
-            position = pointIndex - 6;
+            position =
+                    pointIndex - 6;
 
             return (BOARD_WIDTH / 2)
                     + (BAR_WIDTH / 2)
                     + 10
-                    + (position * POINT_WIDTH);
+                    + (position
+                    * POINT_WIDTH);
         }
 
         if (pointIndex < 18)
         {
-            position = 17 - pointIndex;
+            position =
+                    17 - pointIndex;
 
             return (BOARD_WIDTH / 2)
                     + (BAR_WIDTH / 2)
                     + 10
-                    + (position * POINT_WIDTH);
+                    + (position
+                    * POINT_WIDTH);
         }
 
-        position = 23 - pointIndex;
+        position =
+                23 - pointIndex;
 
         return 20
-                + (position * POINT_WIDTH);
+                + (position
+                * POINT_WIDTH);
     }
 
-    private Color getPointColor(int index)
+    private Color getPointColor(
+            int index)
     {
         if (index % 2 == 0)
         {
