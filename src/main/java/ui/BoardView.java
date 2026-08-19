@@ -15,6 +15,9 @@ import java.util.function.Consumer;
 
 public class BoardView extends Pane
 {
+    public static final int WHITE_BAR = -1;
+    public static final int BLACK_BAR = -2;
+
     private static final double BOARD_WIDTH = 800;
     private static final double BOARD_HEIGHT = 500;
 
@@ -55,7 +58,8 @@ public class BoardView extends Pane
         this.pointClickHandler = handler;
     }
 
-    public void highlightPoints(Set<Integer> points)
+    public void highlightPoints(
+            Set<Integer> points)
     {
         highlightedPoints.clear();
         highlightedPoints.addAll(points);
@@ -74,20 +78,24 @@ public class BoardView extends Pane
     {
         getChildren().clear();
 
-        Rectangle background = new Rectangle(
-                0,
-                0,
-                BOARD_WIDTH,
-                BOARD_HEIGHT
-        );
+        Rectangle background =
+                new Rectangle(
+                        0,
+                        0,
+                        BOARD_WIDTH,
+                        BOARD_HEIGHT
+                );
 
-        background.setFill(Color.BURLYWOOD);
+        background.setFill(
+                Color.BURLYWOOD
+        );
 
         getChildren().add(background);
 
         drawBar();
         drawPoints();
         drawCheckers();
+        drawBarCheckers();
     }
 
     private void drawBar()
@@ -96,14 +104,17 @@ public class BoardView extends Pane
                 (BOARD_WIDTH / 2)
                         - (BAR_WIDTH / 2);
 
-        Rectangle bar = new Rectangle(
-                barX,
-                0,
-                BAR_WIDTH,
-                BOARD_HEIGHT
-        );
+        Rectangle bar =
+                new Rectangle(
+                        barX,
+                        0,
+                        BAR_WIDTH,
+                        BOARD_HEIGHT
+                );
 
-        bar.setFill(Color.SADDLEBROWN);
+        bar.setFill(
+                Color.SADDLEBROWN
+        );
 
         getChildren().add(bar);
     }
@@ -139,11 +150,16 @@ public class BoardView extends Pane
             final int clickedPoint =
                     pointIndex;
 
-            triangle.setOnMouseClicked(event ->
-                    handlePointClick(clickedPoint)
+            triangle.setOnMouseClicked(
+                    event ->
+                            handlePointClick(
+                                    clickedPoint
+                            )
             );
 
-            getChildren().add(triangle);
+            getChildren().add(
+                    triangle
+            );
         }
     }
 
@@ -151,7 +167,8 @@ public class BoardView extends Pane
             double x,
             int index)
     {
-        Polygon triangle = new Polygon();
+        Polygon triangle =
+                new Polygon();
 
         triangle.getPoints().addAll(
                 x, 0.0,
@@ -172,7 +189,8 @@ public class BoardView extends Pane
             double x,
             int index)
     {
-        Polygon triangle = new Polygon();
+        Polygon triangle =
+                new Polygon();
 
         triangle.getPoints().addAll(
                 x, BOARD_HEIGHT,
@@ -220,7 +238,9 @@ public class BoardView extends Pane
              pointIndex++)
         {
             Point point =
-                    board.getPoint(pointIndex);
+                    board.getPoint(
+                            pointIndex
+                    );
 
             if (point.isEmpty())
             {
@@ -266,33 +286,133 @@ public class BoardView extends Pane
                     * CHECKER_SPACING);
         }
 
-        Circle checker = new Circle(
-                x,
-                y,
-                CHECKER_RADIUS
-        );
-
-        if (player == Player.WHITE)
-        {
-            checker.setFill(Color.WHITE);
-            checker.setStroke(Color.BLACK);
-        }
-        else
-        {
-            checker.setFill(Color.BLACK);
-            checker.setStroke(Color.WHITE);
-        }
-
-        checker.setStrokeWidth(2);
+        Circle checker =
+                createChecker(
+                        x,
+                        y,
+                        player
+                );
 
         final int clickedPoint =
                 pointIndex;
 
-        checker.setOnMouseClicked(event ->
-                handlePointClick(clickedPoint)
+        checker.setOnMouseClicked(
+                event ->
+                        handlePointClick(
+                                clickedPoint
+                        )
         );
 
-        getChildren().add(checker);
+        getChildren().add(
+                checker
+        );
+    }
+
+    private void drawBarCheckers()
+    {
+        drawPlayerBarCheckers(
+                Player.WHITE,
+                WHITE_BAR
+        );
+
+        drawPlayerBarCheckers(
+                Player.BLACK,
+                BLACK_BAR
+        );
+    }
+
+    private void drawPlayerBarCheckers(
+            Player player,
+            int barIdentifier)
+    {
+        int count =
+                board.getBarCount(
+                        player
+                );
+
+        if (count == 0)
+        {
+            return;
+        }
+
+        double x =
+                BOARD_WIDTH / 2;
+
+        for (int i = 0;
+             i < count;
+             i++)
+        {
+            double y;
+
+            if (player == Player.WHITE)
+            {
+                y = (BOARD_HEIGHT / 2)
+                        + 30
+                        + (i * CHECKER_SPACING);
+            }
+            else
+            {
+                y = (BOARD_HEIGHT / 2)
+                        - 30
+                        - (i * CHECKER_SPACING);
+            }
+
+            Circle checker =
+                    createChecker(
+                            x,
+                            y,
+                            player
+                    );
+
+            checker.setOnMouseClicked(
+                    event ->
+                            handlePointClick(
+                                    barIdentifier
+                            )
+            );
+
+            getChildren().add(
+                    checker
+            );
+        }
+    }
+
+    private Circle createChecker(
+            double x,
+            double y,
+            Player player)
+    {
+        Circle checker =
+                new Circle(
+                        x,
+                        y,
+                        CHECKER_RADIUS
+                );
+
+        if (player == Player.WHITE)
+        {
+            checker.setFill(
+                    Color.WHITE
+            );
+
+            checker.setStroke(
+                    Color.BLACK
+            );
+        }
+        else
+        {
+            checker.setFill(
+                    Color.BLACK
+            );
+
+            checker.setStroke(
+                    Color.WHITE
+            );
+        }
+
+        checker.setStrokeWidth(2);
+
+        return checker;
     }
 
     private void handlePointClick(

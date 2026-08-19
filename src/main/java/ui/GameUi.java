@@ -28,11 +28,9 @@ import java.util.Set;
 public class GameUi extends Application
 {
     private Integer selectedPoint = null;
-
     private List<MoveSequence> candidateSequences;
 
     private boolean diceRolled = false;
-
     private int moveIndex = 0;
 
     @Override
@@ -47,7 +45,8 @@ public class GameUi extends Application
 
         Label whiteLabel = new Label("White Player");
 
-        ComboBox<String> whitePlayerBox = new ComboBox<>();
+        ComboBox<String> whitePlayerBox =
+                new ComboBox<>();
 
         whitePlayerBox.getItems().addAll(
                 "Human",
@@ -58,9 +57,11 @@ public class GameUi extends Application
 
         whitePlayerBox.setValue("Human");
 
-        Label blackLabel = new Label("Black Player");
+        Label blackLabel =
+                new Label("Black Player");
 
-        ComboBox<String> blackPlayerBox = new ComboBox<>();
+        ComboBox<String> blackPlayerBox =
+                new ComboBox<>();
 
         blackPlayerBox.getItems().addAll(
                 "Human",
@@ -69,9 +70,12 @@ public class GameUi extends Application
                 "Expectimax AI"
         );
 
-        blackPlayerBox.setValue("Heuristic AI");
+        blackPlayerBox.setValue(
+                "Heuristic AI"
+        );
 
-        Button startButton = new Button("Start Game");
+        Button startButton =
+                new Button("Start Game");
 
         startButton.setOnAction(event ->
                 showGameScreen(
@@ -94,11 +98,8 @@ public class GameUi extends Application
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(30));
 
-        Scene scene = new Scene(
-                layout,
-                900,
-                650
-        );
+        Scene scene =
+                new Scene(layout, 900, 650);
 
         stage.setTitle("Backgammon AI");
         stage.setScene(scene);
@@ -112,7 +113,8 @@ public class GameUi extends Application
     {
         Game game = new Game();
 
-        Board board = game.getBoard();
+        Board board =
+                game.getBoard();
 
         MoveGenerator moveGenerator =
                 new MoveGenerator();
@@ -122,24 +124,25 @@ public class GameUi extends Application
         diceRolled = false;
         moveIndex = 0;
 
-        Label playerTypesLabel = new Label(
-                "White: " + whitePlayer
-                        + " | Black: "
-                        + blackPlayer
-        );
+        Label playerTypesLabel =
+                new Label(
+                        "White: "
+                                + whitePlayer
+                                + " | Black: "
+                                + blackPlayer
+                );
 
-        Label currentPlayerLabel = new Label(
-                "Current Player: "
-                        + game.getCurrentPlayer()
-        );
+        Label currentPlayerLabel =
+                new Label(
+                        "Current Player: "
+                                + game.getCurrentPlayer()
+                );
 
-        Label diceLabel = new Label(
-                "Dice: - | -"
-        );
+        Label diceLabel =
+                new Label("Dice: - | -");
 
-        Label instructionLabel = new Label(
-                "Roll the dice."
-        );
+        Label instructionLabel =
+                new Label("Roll the dice.");
 
         Button rollButton =
                 new Button("Roll Dice");
@@ -147,6 +150,9 @@ public class GameUi extends Application
         BoardView boardView =
                 new BoardView(board);
 
+        /*
+         * ROLL DICE
+         */
         rollButton.setOnAction(event ->
         {
             if (diceRolled)
@@ -154,7 +160,8 @@ public class GameUi extends Application
                 return;
             }
 
-            Dice dice = game.getDice();
+            Dice dice =
+                    game.getDice();
 
             dice.roll();
 
@@ -166,14 +173,17 @@ public class GameUi extends Application
             );
 
             candidateSequences =
-                    moveGenerator.generateMoveSequences(
-                            board,
-                            game.getCurrentPlayer(),
-                            dice
-                    );
+                    moveGenerator
+                            .generateMoveSequences(
+                                    board,
+                                    game.getCurrentPlayer(),
+                                    dice
+                            );
 
             moveIndex = 0;
             selectedPoint = null;
+
+            boardView.clearHighlights();
 
             if (candidateSequences.isEmpty())
             {
@@ -197,149 +207,228 @@ public class GameUi extends Application
 
             diceRolled = true;
 
-            instructionLabel.setText(
-                    "Select a checker."
-            );
-        });
-
-        boardView.setOnPointClicked(pointIndex ->
-        {
-            if (!diceRolled
-                    || candidateSequences == null
-                    || candidateSequences.isEmpty())
-            {
-                return;
-            }
-
-            Player currentPlayer =
-                    game.getCurrentPlayer();
-
-            if (hasBarEntryMove())
+            if (currentMoveRequiresBarEntry())
             {
                 instructionLabel.setText(
-                        "Bar entry controls are the next feature."
+                        "You have a checker on the bar. "
+                                + "Select it to re-enter."
                 );
-
-                return;
             }
-
-            if (selectedPoint == null)
+            else
             {
-                if (board.getPoint(pointIndex)
-                        .getOwner() != currentPlayer)
-                {
-                    instructionLabel.setText(
-                            "Select one of your own checkers."
-                    );
-
-                    return;
-                }
-
-                Set<Integer> destinations =
-                        findDestinations(
-                                pointIndex
-                        );
-
-                if (destinations.isEmpty())
-                {
-                    instructionLabel.setText(
-                            "That checker cannot move."
-                    );
-
-                    return;
-                }
-
-                selectedPoint = pointIndex;
-
-                boardView.highlightPoints(
-                        destinations
-                );
-
                 instructionLabel.setText(
-                        "Select a highlighted destination."
+                        "Select a checker."
                 );
-
-                return;
             }
+        });
 
-            Move selectedMove =
-                    findMove(
-                            selectedPoint,
-                            pointIndex
-                    );
-
-            if (selectedMove != null)
-            {
-                board.applyMove(selectedMove);
-
-                filterSequences(selectedMove);
-
-                moveIndex++;
-
-                selectedPoint = null;
-
-                boardView.clearHighlights();
-                boardView.refresh();
-
-                if (turnIsComplete())
+        /*
+         * BOARD / CHECKER CLICK
+         */
+        boardView.setOnPointClicked(
+                pointIndex ->
                 {
-                    game.switchPlayer();
+                    if (!diceRolled
+                            || candidateSequences == null
+                            || candidateSequences.isEmpty())
+                    {
+                        return;
+                    }
 
-                    currentPlayerLabel.setText(
-                            "Current Player: "
-                                    + game.getCurrentPlayer()
-                    );
+                    Player currentPlayer =
+                            game.getCurrentPlayer();
 
-                    diceLabel.setText(
-                            "Dice: - | -"
-                    );
+                    /*
+                     * BAR ENTRY
+                     */
+                    if (currentMoveRequiresBarEntry())
+                    {
+                        int correctBar =
+                                currentPlayer
+                                        == Player.WHITE
+                                        ? BoardView.WHITE_BAR
+                                        : BoardView.BLACK_BAR;
 
-                    instructionLabel.setText(
-                            "Turn complete. Roll the dice."
-                    );
+                        /*
+                         * Nothing selected yet.
+                         * Player must select their bar checker.
+                         */
+                        if (selectedPoint == null)
+                        {
+                            if (pointIndex
+                                    != correctBar)
+                            {
+                                instructionLabel.setText(
+                                        "You must enter your checker "
+                                                + "from the bar first."
+                                );
 
-                    diceRolled = false;
-                    candidateSequences = null;
-                    moveIndex = 0;
-                }
-                else
-                {
-                    instructionLabel.setText(
-                            "Select your next checker."
-                    );
-                }
+                                return;
+                            }
 
-                return;
-            }
+                            selectedPoint =
+                                    correctBar;
 
-            if (board.getPoint(pointIndex)
-                    .getOwner() == currentPlayer)
-            {
-                Set<Integer> destinations =
-                        findDestinations(
-                                pointIndex
+                            Set<Integer> destinations =
+                                    findBarDestinations();
+
+                            boardView.highlightPoints(
+                                    destinations
+                            );
+
+                            instructionLabel.setText(
+                                    "Select a highlighted entry point."
+                            );
+
+                            return;
+                        }
+
+                        /*
+                         * Bar checker has already been selected.
+                         */
+                        if (selectedPoint
+                                == correctBar)
+                        {
+                            Move selectedMove =
+                                    findBarMove(
+                                            pointIndex
+                                    );
+
+                            if (selectedMove != null)
+                            {
+                                applySelectedMove(
+                                        selectedMove,
+                                        game,
+                                        board,
+                                        boardView,
+                                        currentPlayerLabel,
+                                        diceLabel,
+                                        instructionLabel
+                                );
+
+                                return;
+                            }
+                        }
+
+                        instructionLabel.setText(
+                                "That is not a legal entry point."
                         );
 
-                if (!destinations.isEmpty())
-                {
-                    selectedPoint = pointIndex;
+                        return;
+                    }
 
-                    boardView.highlightPoints(
-                            destinations
-                    );
+                    /*
+                     * NORMAL BOARD MOVEMENT
+                     */
+                    if (selectedPoint == null)
+                    {
+                        if (pointIndex < 0
+                                || board.getPoint(pointIndex)
+                                .getOwner()
+                                != currentPlayer)
+                        {
+                            instructionLabel.setText(
+                                    "Select one of your own checkers."
+                            );
+
+                            return;
+                        }
+
+                        Set<Integer> destinations =
+                                findDestinations(
+                                        pointIndex
+                                );
+
+                        if (destinations.isEmpty())
+                        {
+                            instructionLabel.setText(
+                                    "That checker cannot move."
+                            );
+
+                            return;
+                        }
+
+                        selectedPoint =
+                                pointIndex;
+
+                        boardView.highlightPoints(
+                                destinations
+                        );
+
+                        instructionLabel.setText(
+                                "Select a highlighted destination."
+                        );
+
+                        return;
+                    }
+
+                    /*
+                     * Prevent bar identifiers from being treated
+                     * as normal board indexes.
+                     */
+                    if (pointIndex < 0)
+                    {
+                        instructionLabel.setText(
+                                "Select a legal board point."
+                        );
+
+                        return;
+                    }
+
+                    Move selectedMove =
+                            findMove(
+                                    selectedPoint,
+                                    pointIndex
+                            );
+
+                    if (selectedMove != null)
+                    {
+                        applySelectedMove(
+                                selectedMove,
+                                game,
+                                board,
+                                boardView,
+                                currentPlayerLabel,
+                                diceLabel,
+                                instructionLabel
+                        );
+
+                        return;
+                    }
+
+                    /*
+                     * Change selected checker.
+                     */
+                    if (board.getPoint(pointIndex)
+                            .getOwner()
+                            == currentPlayer)
+                    {
+                        Set<Integer> destinations =
+                                findDestinations(
+                                        pointIndex
+                                );
+
+                        if (!destinations.isEmpty())
+                        {
+                            selectedPoint =
+                                    pointIndex;
+
+                            boardView.highlightPoints(
+                                    destinations
+                            );
+
+                            instructionLabel.setText(
+                                    "Select a highlighted destination."
+                            );
+
+                            return;
+                        }
+                    }
 
                     instructionLabel.setText(
-                            "Select a highlighted destination."
+                            "That is not a legal destination."
                     );
-
-                    return;
-                }
-            }
-
-            instructionLabel.setText(
-                    "That is not a legal destination."
-            );
-        });
+                });
 
         Button backButton =
                 new Button("Back");
@@ -389,6 +478,79 @@ public class GameUi extends Application
         stage.setScene(scene);
     }
 
+    /*
+     * Apply a move shared by both normal moves
+     * and bar-entry moves.
+     */
+    private void applySelectedMove(
+            Move selectedMove,
+            Game game,
+            Board board,
+            BoardView boardView,
+            Label currentPlayerLabel,
+            Label diceLabel,
+            Label instructionLabel)
+    {
+        board.applyMove(
+                selectedMove
+        );
+
+        filterSequences(
+                selectedMove
+        );
+
+        moveIndex++;
+        selectedPoint = null;
+
+        boardView.clearHighlights();
+        boardView.refresh();
+
+        if (turnIsComplete())
+        {
+            game.switchPlayer();
+
+            currentPlayerLabel.setText(
+                    "Current Player: "
+                            + game.getCurrentPlayer()
+            );
+
+            diceLabel.setText(
+                    "Dice: - | -"
+            );
+
+            instructionLabel.setText(
+                    "Turn complete. Roll the dice."
+            );
+
+            diceRolled = false;
+            candidateSequences = null;
+            moveIndex = 0;
+
+            return;
+        }
+
+        /*
+         * The player may still have another checker
+         * on the bar, particularly after rolling doubles
+         * or having multiple captured checkers.
+         */
+        if (currentMoveRequiresBarEntry())
+        {
+            instructionLabel.setText(
+                    "Select your checker on the bar."
+            );
+        }
+        else
+        {
+            instructionLabel.setText(
+                    "Select your next checker."
+            );
+        }
+    }
+
+    /*
+     * Find legal normal destinations.
+     */
     private Set<Integer> findDestinations(
             int fromPoint)
     {
@@ -398,7 +560,8 @@ public class GameUi extends Application
         for (MoveSequence sequence
                 : candidateSequences)
         {
-            if (sequence.size() <= moveIndex)
+            if (sequence.size()
+                    <= moveIndex)
             {
                 continue;
             }
@@ -425,6 +588,9 @@ public class GameUi extends Application
         return destinations;
     }
 
+    /*
+     * Find a selected normal move.
+     */
     private Move findMove(
             int fromPoint,
             int toPoint)
@@ -432,7 +598,8 @@ public class GameUi extends Application
         for (MoveSequence sequence
                 : candidateSequences)
         {
-            if (sequence.size() <= moveIndex)
+            if (sequence.size()
+                    <= moveIndex)
             {
                 continue;
             }
@@ -447,8 +614,10 @@ public class GameUi extends Application
                 continue;
             }
 
-            if (move.getFromPoint() == fromPoint
-                    && move.getToPoint() == toPoint)
+            if (move.getFromPoint()
+                    == fromPoint
+                    && move.getToPoint()
+                    == toPoint)
             {
                 return move;
             }
@@ -457,6 +626,107 @@ public class GameUi extends Application
         return null;
     }
 
+    /*
+     * Get every legal point the current
+     * bar checker can enter onto.
+     */
+    private Set<Integer> findBarDestinations()
+    {
+        Set<Integer> destinations =
+                new HashSet<>();
+
+        for (MoveSequence sequence
+                : candidateSequences)
+        {
+            if (sequence.size()
+                    <= moveIndex)
+            {
+                continue;
+            }
+
+            Move move =
+                    sequence.getMoves()
+                            .get(moveIndex);
+
+            if (move.isEnteringFromBar())
+            {
+                destinations.add(
+                        move.getToPoint()
+                );
+            }
+        }
+
+        return destinations;
+    }
+
+    /*
+     * Find the bar-entry move matching
+     * the clicked destination.
+     */
+    private Move findBarMove(
+            int toPoint)
+    {
+        for (MoveSequence sequence
+                : candidateSequences)
+        {
+            if (sequence.size()
+                    <= moveIndex)
+            {
+                continue;
+            }
+
+            Move move =
+                    sequence.getMoves()
+                            .get(moveIndex);
+
+            if (move.isEnteringFromBar()
+                    && move.getToPoint()
+                    == toPoint)
+            {
+                return move;
+            }
+        }
+
+        return null;
+    }
+
+    /*
+     * Check whether the next move must
+     * come from the bar.
+     */
+    private boolean currentMoveRequiresBarEntry()
+    {
+        if (candidateSequences == null)
+        {
+            return false;
+        }
+
+        for (MoveSequence sequence
+                : candidateSequences)
+        {
+            if (sequence.size()
+                    <= moveIndex)
+            {
+                continue;
+            }
+
+            Move move =
+                    sequence.getMoves()
+                            .get(moveIndex);
+
+            if (move.isEnteringFromBar())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /*
+     * Keep only sequences compatible with
+     * the move the human selected.
+     */
     private void filterSequences(
             Move selectedMove)
     {
@@ -466,7 +736,8 @@ public class GameUi extends Application
         for (MoveSequence sequence
                 : candidateSequences)
         {
-            if (sequence.size() <= moveIndex)
+            if (sequence.size()
+                    <= moveIndex)
             {
                 continue;
             }
@@ -479,11 +750,14 @@ public class GameUi extends Application
                     move,
                     selectedMove))
             {
-                filtered.add(sequence);
+                filtered.add(
+                        sequence
+                );
             }
         }
 
-        candidateSequences = filtered;
+        candidateSequences =
+                filtered;
     }
 
     private boolean movesMatch(
@@ -530,33 +804,13 @@ public class GameUi extends Application
         for (MoveSequence sequence
                 : candidateSequences)
         {
-            if (sequence.size() > moveIndex)
+            if (sequence.size()
+                    > moveIndex)
             {
                 return false;
             }
         }
 
         return true;
-    }
-
-    private boolean hasBarEntryMove()
-    {
-        for (MoveSequence sequence
-                : candidateSequences)
-        {
-            if (sequence.size() <= moveIndex)
-            {
-                continue;
-            }
-
-            if (sequence.getMoves()
-                    .get(moveIndex)
-                    .isEnteringFromBar())
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
