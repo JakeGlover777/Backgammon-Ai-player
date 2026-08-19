@@ -17,6 +17,8 @@ public class BoardView extends Pane
 {
     public static final int WHITE_BAR = -1;
     public static final int BLACK_BAR = -2;
+    public static final int WHITE_BEAR_OFF = -3;
+    public static final int BLACK_BEAR_OFF = -4;
 
     private static final double BOARD_WIDTH = 800;
     private static final double BOARD_HEIGHT = 500;
@@ -94,6 +96,7 @@ public class BoardView extends Pane
 
         drawBar();
         drawPoints();
+        drawBearOffAreas();
         drawCheckers();
         drawBarCheckers();
     }
@@ -117,6 +120,63 @@ public class BoardView extends Pane
         );
 
         getChildren().add(bar);
+    }
+
+    private void drawBearOffAreas()
+    {
+        double areaWidth = 28;
+        double areaHeight = 180;
+
+        Rectangle blackArea =
+                new Rectangle(
+                        2,
+                        (BOARD_HEIGHT - areaHeight) / 2,
+                        areaWidth,
+                        areaHeight
+                );
+
+        blackArea.setFill(
+                highlightedPoints.contains(BLACK_BEAR_OFF)
+                        ? Color.GOLD
+                        : Color.LIGHTGRAY
+        );
+
+        blackArea.setStroke(Color.BLACK);
+
+        blackArea.setOnMouseClicked(
+                event ->
+                        handlePointClick(
+                                BLACK_BEAR_OFF
+                        )
+        );
+
+        Rectangle whiteArea =
+                new Rectangle(
+                        BOARD_WIDTH - areaWidth - 2,
+                        (BOARD_HEIGHT - areaHeight) / 2,
+                        areaWidth,
+                        areaHeight
+                );
+
+        whiteArea.setFill(
+                highlightedPoints.contains(WHITE_BEAR_OFF)
+                        ? Color.GOLD
+                        : Color.LIGHTGRAY
+        );
+
+        whiteArea.setStroke(Color.BLACK);
+
+        whiteArea.setOnMouseClicked(
+                event ->
+                        handlePointClick(
+                                WHITE_BEAR_OFF
+                        )
+        );
+
+        getChildren().addAll(
+                blackArea,
+                whiteArea
+        );
     }
 
     private void drawPoints()

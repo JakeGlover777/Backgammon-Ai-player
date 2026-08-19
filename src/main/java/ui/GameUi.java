@@ -150,9 +150,6 @@ public class GameUi extends Application
         BoardView boardView =
                 new BoardView(board);
 
-        /*
-         * ROLL DICE
-         */
         rollButton.setOnAction(event ->
         {
             if (diceRolled)
@@ -222,9 +219,6 @@ public class GameUi extends Application
             }
         });
 
-        /*
-         * BOARD / CHECKER CLICK
-         */
         boardView.setOnPointClicked(
                 pointIndex ->
                 {
@@ -238,9 +232,6 @@ public class GameUi extends Application
                     Player currentPlayer =
                             game.getCurrentPlayer();
 
-                    /*
-                     * BAR ENTRY
-                     */
                     if (currentMoveRequiresBarEntry())
                     {
                         int correctBar =
@@ -249,10 +240,6 @@ public class GameUi extends Application
                                         ? BoardView.WHITE_BAR
                                         : BoardView.BLACK_BAR;
 
-                        /*
-                         * Nothing selected yet.
-                         * Player must select their bar checker.
-                         */
                         if (selectedPoint == null)
                         {
                             if (pointIndex
@@ -283,9 +270,6 @@ public class GameUi extends Application
                             return;
                         }
 
-                        /*
-                         * Bar checker has already been selected.
-                         */
                         if (selectedPoint
                                 == correctBar)
                         {
@@ -317,9 +301,6 @@ public class GameUi extends Application
                         return;
                     }
 
-                    /*
-                     * NORMAL BOARD MOVEMENT
-                     */
                     if (selectedPoint == null)
                     {
                         if (pointIndex < 0
@@ -362,14 +343,13 @@ public class GameUi extends Application
                         return;
                     }
 
-                    /*
-                     * Prevent bar identifiers from being treated
-                     * as normal board indexes.
-                     */
-                    if (pointIndex < 0)
+                    if (pointIndex
+                            == BoardView.WHITE_BAR
+                            || pointIndex
+                            == BoardView.BLACK_BAR)
                     {
                         instructionLabel.setText(
-                                "Select a legal board point."
+                                "Select a legal destination."
                         );
 
                         return;
@@ -396,9 +376,15 @@ public class GameUi extends Application
                         return;
                     }
 
-                    /*
-                     * Change selected checker.
-                     */
+                    if (pointIndex < 0)
+                    {
+                        instructionLabel.setText(
+                                "That is not a legal destination."
+                        );
+
+                        return;
+                    }
+
                     if (board.getPoint(pointIndex)
                             .getOwner()
                             == currentPlayer)
@@ -478,10 +464,6 @@ public class GameUi extends Application
         stage.setScene(scene);
     }
 
-    /*
-     * Apply a move shared by both normal moves
-     * and bar-entry moves.
-     */
     private void applySelectedMove(
             Move selectedMove,
             Game game,
@@ -504,6 +486,30 @@ public class GameUi extends Application
 
         boardView.clearHighlights();
         boardView.refresh();
+
+        Player winner =
+                game.getWinner();
+
+        if (winner != Player.NONE)
+        {
+            currentPlayerLabel.setText(
+                    "Winner: " + winner
+            );
+
+            diceLabel.setText(
+                    "Dice: - | -"
+            );
+
+            instructionLabel.setText(
+                    winner + " wins the game!"
+            );
+
+            diceRolled = false;
+            candidateSequences = null;
+            moveIndex = 0;
+
+            return;
+        }
 
         if (turnIsComplete())
         {
@@ -529,11 +535,6 @@ public class GameUi extends Application
             return;
         }
 
-        /*
-         * The player may still have another checker
-         * on the bar, particularly after rolling doubles
-         * or having multiple captured checkers.
-         */
         if (currentMoveRequiresBarEntry())
         {
             instructionLabel.setText(
@@ -548,9 +549,6 @@ public class GameUi extends Application
         }
     }
 
-    /*
-     * Find legal normal destinations.
-     */
     private Set<Integer> findDestinations(
             int fromPoint)
     {
@@ -570,9 +568,25 @@ public class GameUi extends Application
                     sequence.getMoves()
                             .get(moveIndex);
 
-            if (move.isEnteringFromBar()
-                    || move.isBearingOff())
+            if (move.isEnteringFromBar())
             {
+                continue;
+            }
+
+            if (move.isBearingOff()
+                    && move.getFromPoint()
+                    == fromPoint)
+            {
+                int bearOffDestination =
+                        move.getPlayer()
+                                == Player.WHITE
+                                ? BoardView.WHITE_BEAR_OFF
+                                : BoardView.BLACK_BEAR_OFF;
+
+                destinations.add(
+                        bearOffDestination
+                );
+
                 continue;
             }
 
@@ -588,9 +602,6 @@ public class GameUi extends Application
         return destinations;
     }
 
-    /*
-     * Find a selected normal move.
-     */
     private Move findMove(
             int fromPoint,
             int toPoint)
@@ -608,9 +619,27 @@ public class GameUi extends Application
                     sequence.getMoves()
                             .get(moveIndex);
 
-            if (move.isEnteringFromBar()
-                    || move.isBearingOff())
+            if (move.isEnteringFromBar())
             {
+                continue;
+            }
+
+            if (move.isBearingOff())
+            {
+                int bearOffDestination =
+                        move.getPlayer()
+                                == Player.WHITE
+                                ? BoardView.WHITE_BEAR_OFF
+                                : BoardView.BLACK_BEAR_OFF;
+
+                if (move.getFromPoint()
+                        == fromPoint
+                        && toPoint
+                        == bearOffDestination)
+                {
+                    return move;
+                }
+
                 continue;
             }
 
@@ -626,10 +655,6 @@ public class GameUi extends Application
         return null;
     }
 
-    /*
-     * Get every legal point the current
-     * bar checker can enter onto.
-     */
     private Set<Integer> findBarDestinations()
     {
         Set<Integer> destinations =
@@ -659,10 +684,6 @@ public class GameUi extends Application
         return destinations;
     }
 
-    /*
-     * Find the bar-entry move matching
-     * the clicked destination.
-     */
     private Move findBarMove(
             int toPoint)
     {
@@ -690,10 +711,6 @@ public class GameUi extends Application
         return null;
     }
 
-    /*
-     * Check whether the next move must
-     * come from the bar.
-     */
     private boolean currentMoveRequiresBarEntry()
     {
         if (candidateSequences == null)
@@ -723,10 +740,6 @@ public class GameUi extends Application
         return false;
     }
 
-    /*
-     * Keep only sequences compatible with
-     * the move the human selected.
-     */
     private void filterSequences(
             Move selectedMove)
     {
