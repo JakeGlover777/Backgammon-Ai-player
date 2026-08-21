@@ -1,5 +1,7 @@
 package ui;
 
+import ai.AiPlayer;
+import ai.RandomAi;
 import game.Board;
 import game.Dice;
 import game.Game;
@@ -8,6 +10,7 @@ import game.MoveGenerator;
 import game.MoveSequence;
 import game.Player;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,6 +22,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,6 +36,10 @@ public class GameUi extends Application
 
     private boolean diceRolled = false;
     private int moveIndex = 0;
+
+    private String whitePlayerType;
+    private String blackPlayerType;
+    private boolean gameOver = false;
 
     @Override
     public void start(Stage stage)
@@ -113,6 +121,10 @@ public class GameUi extends Application
     {
         Game game = new Game();
 
+        whitePlayerType = whitePlayer;
+        blackPlayerType = blackPlayer;
+        gameOver = false;
+
         Board board =
                 game.getBoard();
 
@@ -152,7 +164,9 @@ public class GameUi extends Application
 
         rollButton.setOnAction(event ->
         {
-            if (diceRolled)
+            if (gameOver
+                    || diceRolled
+                    || isRandomAiTurn(game))
             {
                 return;
             }
@@ -199,6 +213,15 @@ public class GameUi extends Application
                         "Dice: - | -"
                 );
 
+                scheduleAiTurn(
+                        game,
+                        board,
+                        boardView,
+                        currentPlayerLabel,
+                        diceLabel,
+                        instructionLabel
+                );
+
                 return;
             }
 
@@ -222,7 +245,9 @@ public class GameUi extends Application
         boardView.setOnPointClicked(
                 pointIndex ->
                 {
-                    if (!diceRolled
+                    if (gameOver
+                            || isRandomAiTurn(game)
+                            || !diceRolled
                             || candidateSequences == null
                             || candidateSequences.isEmpty())
                     {
@@ -462,6 +487,166 @@ public class GameUi extends Application
                 );
 
         stage.setScene(scene);
+
+        scheduleAiTurn(
+                game,
+                board,
+                boardView,
+                currentPlayerLabel,
+                diceLabel,
+                instructionLabel
+        );
+    }
+
+    private boolean isRandomAiTurn(
+            Game game)
+    {
+        if (game.getCurrentPlayer()
+                == Player.WHITE)
+        {
+            return "Random AI".equals(
+                    whitePlayerType
+            );
+        }
+
+        return "Random AI".equals(
+                blackPlayerType
+        );
+    }
+
+    private void scheduleAiTurn(
+            Game game,
+            Board board,
+            BoardView boardView,
+            Label currentPlayerLabel,
+            Label diceLabel,
+            Label instructionLabel)
+    {
+        if (gameOver
+                || !isRandomAiTurn(game))
+        {
+            return;
+        }
+
+        PauseTransition pause =
+                new PauseTransition(
+                        Duration.millis(500)
+                );
+
+        pause.setOnFinished(event ->
+                playRandomAiTurn(
+                        game,
+                        board,
+                        boardView,
+                        currentPlayerLabel,
+                        diceLabel,
+                        instructionLabel
+                )
+        );
+
+        pause.play();
+    }
+
+    private void playRandomAiTurn(
+            Game game,
+            Board board,
+            BoardView boardView,
+            Label currentPlayerLabel,
+            Label diceLabel,
+            Label instructionLabel)
+    {
+        if (gameOver)
+        {
+            return;
+        }
+
+        Player player =
+                game.getCurrentPlayer();
+
+        Dice dice =
+                game.getDice();
+
+        dice.roll();
+
+        diceLabel.setText(
+                "Dice: "
+                        + dice.getDieOne()
+                        + " | "
+                        + dice.getDieTwo()
+        );
+
+        instructionLabel.setText(
+                player
+                        + " Random AI is moving."
+        );
+
+        AiPlayer randomAi =
+                new RandomAi();
+
+        MoveSequence sequence =
+                randomAi.chooseMove(
+                        board,
+                        player,
+                        dice
+                );
+
+        if (!sequence.isEmpty())
+        {
+            for (Move move
+                    : sequence.getMoves())
+            {
+                board.applyMove(move);
+            }
+        }
+
+        boardView.clearHighlights();
+        boardView.refresh();
+
+        Player winner =
+                game.getWinner();
+
+        if (winner != Player.NONE)
+        {
+            gameOver = true;
+
+            currentPlayerLabel.setText(
+                    "Winner: " + winner
+            );
+
+            diceLabel.setText(
+                    "Dice: - | -"
+            );
+
+            instructionLabel.setText(
+                    winner + " wins the game!"
+            );
+
+            return;
+        }
+
+        game.switchPlayer();
+
+        currentPlayerLabel.setText(
+                "Current Player: "
+                        + game.getCurrentPlayer()
+        );
+
+        diceLabel.setText(
+                "Dice: - | -"
+        );
+
+        instructionLabel.setText(
+                "Turn complete."
+        );
+
+        scheduleAiTurn(
+                game,
+                board,
+                boardView,
+                currentPlayerLabel,
+                diceLabel,
+                instructionLabel
+        );
     }
 
     private void applySelectedMove(
@@ -492,6 +677,8 @@ public class GameUi extends Application
 
         if (winner != Player.NONE)
         {
+            gameOver = true;
+
             currentPlayerLabel.setText(
                     "Winner: " + winner
             );
@@ -531,6 +718,15 @@ public class GameUi extends Application
             diceRolled = false;
             candidateSequences = null;
             moveIndex = 0;
+
+            scheduleAiTurn(
+                    game,
+                    board,
+                    boardView,
+                    currentPlayerLabel,
+                    diceLabel,
+                    instructionLabel
+            );
 
             return;
         }
