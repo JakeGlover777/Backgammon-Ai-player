@@ -99,7 +99,7 @@ public class MoveGeneratorTest
             assertEquals(1, sequence.size());
             assertEquals(
                     5,
-                    sequence.getMoves().get(0).getDieValue()
+                    sequence.getMoves().getFirst().getDieValue()
             );
         }
     }
@@ -167,7 +167,7 @@ public class MoveGeneratorTest
         {
             assertTrue(
                     sequence.getMoves()
-                            .get(0)
+                            .getFirst()
                             .isEnteringFromBar()
             );
         }
@@ -213,7 +213,7 @@ public class MoveGeneratorTest
             {
                 assertTrue(
                         sequence.getMoves()
-                                .get(0)
+                                .getFirst()
                                 .isEnteringFromBar()
                 );
 

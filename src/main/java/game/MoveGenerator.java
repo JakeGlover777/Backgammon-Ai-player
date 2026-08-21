@@ -193,7 +193,7 @@ public class MoveGenerator
             for (MoveSequence sequence : sequences)
             {
                 if (sequence.getMoves()
-                        .get(0)
+                        .getFirst()
                         .getDieValue() == higherDie)
                 {
                     higherDieCanBeUsed = true;
@@ -206,7 +206,7 @@ public class MoveGenerator
                 sequences.removeIf(
                         sequence ->
                                 sequence.getMoves()
-                                        .get(0)
+                                        .getFirst()
                                         .getDieValue() != higherDie
                 );
             }

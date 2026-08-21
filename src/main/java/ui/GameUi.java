@@ -1,6 +1,7 @@
 package ui;
 
 import ai.AiPlayer;
+import ai.ExpectimaxAi;
 import ai.HeuristicAi;
 import ai.RandomAi;
 import game.Board;
@@ -540,6 +541,11 @@ public class GameUi extends Application
         if ("Heuristic AI".equals(playerType))
         {
             return new HeuristicAi();
+        }
+
+        if ("Expectimax AI".equals(playerType))
+        {
+            return new ExpectimaxAi();
         }
 
         return null;
