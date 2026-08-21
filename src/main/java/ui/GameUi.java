@@ -1,6 +1,7 @@
 package ui;
 
 import ai.AiPlayer;
+import ai.HeuristicAi;
 import ai.RandomAi;
 import game.Board;
 import game.Dice;
@@ -166,7 +167,7 @@ public class GameUi extends Application
         {
             if (gameOver
                     || diceRolled
-                    || isRandomAiTurn(game))
+                    || isAiTurn(game))
             {
                 return;
             }
@@ -246,7 +247,7 @@ public class GameUi extends Application
                 pointIndex ->
                 {
                     if (gameOver
-                            || isRandomAiTurn(game)
+                            || isAiTurn(game)
                             || !diceRolled
                             || candidateSequences == null
                             || candidateSequences.isEmpty())
@@ -498,20 +499,50 @@ public class GameUi extends Application
         );
     }
 
-    private boolean isRandomAiTurn(
+    private boolean isAiTurn(
             Game game)
     {
+        String playerType;
+
         if (game.getCurrentPlayer()
                 == Player.WHITE)
         {
-            return "Random AI".equals(
-                    whitePlayerType
-            );
+            playerType = whitePlayerType;
+        }
+        else
+        {
+            playerType = blackPlayerType;
         }
 
-        return "Random AI".equals(
-                blackPlayerType
-        );
+        return !"Human".equals(playerType);
+    }
+
+    private AiPlayer getAiPlayer(
+            Game game)
+    {
+        String playerType;
+
+        if (game.getCurrentPlayer()
+                == Player.WHITE)
+        {
+            playerType = whitePlayerType;
+        }
+        else
+        {
+            playerType = blackPlayerType;
+        }
+
+        if ("Random AI".equals(playerType))
+        {
+            return new RandomAi();
+        }
+
+        if ("Heuristic AI".equals(playerType))
+        {
+            return new HeuristicAi();
+        }
+
+        return null;
     }
 
     private void scheduleAiTurn(
@@ -523,7 +554,7 @@ public class GameUi extends Application
             Label instructionLabel)
     {
         if (gameOver
-                || !isRandomAiTurn(game))
+                || !isAiTurn(game))
         {
             return;
         }
@@ -534,7 +565,7 @@ public class GameUi extends Application
                 );
 
         pause.setOnFinished(event ->
-                playRandomAiTurn(
+                playAiTurn(
                         game,
                         board,
                         boardView,
@@ -547,7 +578,7 @@ public class GameUi extends Application
         pause.play();
     }
 
-    private void playRandomAiTurn(
+    private void playAiTurn(
             Game game,
             Board board,
             BoardView boardView,
@@ -563,6 +594,14 @@ public class GameUi extends Application
         Player player =
                 game.getCurrentPlayer();
 
+        AiPlayer aiPlayer =
+                getAiPlayer(game);
+
+        if (aiPlayer == null)
+        {
+            return;
+        }
+
         Dice dice =
                 game.getDice();
 
@@ -577,14 +616,11 @@ public class GameUi extends Application
 
         instructionLabel.setText(
                 player
-                        + " Random AI is moving."
+                        + " AI is moving."
         );
 
-        AiPlayer randomAi =
-                new RandomAi();
-
         MoveSequence sequence =
-                randomAi.chooseMove(
+                aiPlayer.chooseMove(
                         board,
                         player,
                         dice
