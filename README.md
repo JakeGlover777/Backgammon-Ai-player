@@ -39,7 +39,7 @@ The project is being extended to evaluate factors including:
 
 ## 🛠️ Technologies
 
-- **Java**
+- **Java 25**
 - **Object-Oriented Programming**
 - **Artificial Intelligence**
 - **Heuristic Search**
@@ -65,3 +65,8 @@ The research focuses on using Backgammon as an environment for investigating AI 
 Currently under active development as part of my MSc Computer Science dissertation.
 
 Evaluation results and further AI experiments will be added as the project progresses.
+
+## Requirements
+
+- Java 25 or later
+- Maven
