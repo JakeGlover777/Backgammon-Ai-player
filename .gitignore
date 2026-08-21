@@ -1,1 +1,16 @@
-/out
+# Maven build output
+target/
+
+# IntelliJ build output
+/out/
+
+# IntelliJ project files
+.idea/
+*.iml
+
+# Local dependency directory
+lib/
+
+# OS files
+.DS_Store
+Thumbs.db
