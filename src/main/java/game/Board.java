@@ -3,6 +3,26 @@ package game;
 public class Board
 {
     private static final int BOARD_SIZE = 24;
+    private static final int WHITE_HOME_START = 18;
+    private static final int BLACK_HOME_END = 6;
+
+    private static final int WHITE_START_POINT_ONE = 0;
+    private static final int WHITE_START_COUNT_ONE = 2;
+    private static final int WHITE_START_POINT_TWO = 11;
+    private static final int WHITE_START_COUNT_TWO = 5;
+    private static final int WHITE_START_POINT_THREE = 16;
+    private static final int WHITE_START_COUNT_THREE = 3;
+    private static final int WHITE_START_POINT_FOUR = 18;
+    private static final int WHITE_START_COUNT_FOUR = 5;
+
+    private static final int BLACK_START_POINT_ONE = 23;
+    private static final int BLACK_START_COUNT_ONE = 2;
+    private static final int BLACK_START_POINT_TWO = 12;
+    private static final int BLACK_START_COUNT_TWO = 5;
+    private static final int BLACK_START_POINT_THREE = 7;
+    private static final int BLACK_START_COUNT_THREE = 3;
+    private static final int BLACK_START_POINT_FOUR = 5;
+    private static final int BLACK_START_COUNT_FOUR = 5;
 
     private final Point[] points;
 
@@ -27,7 +47,6 @@ public class Board
 
         whiteCheckersOnBar = 0;
         blackCheckersOnBar = 0;
-
         whiteCheckersBorneOff = 0;
         blackCheckersBorneOff = 0;
 
@@ -37,14 +56,27 @@ public class Board
         }
     }
 
+    public Board(Board other)
+    {
+        points = new Point[BOARD_SIZE];
+
+        for (int i = 0; i < BOARD_SIZE; i++)
+        {
+            points[i] = new Point(other.points[i]);
+        }
+
+        whiteCheckersBorneOff = other.whiteCheckersBorneOff;
+        blackCheckersBorneOff = other.blackCheckersBorneOff;
+        whiteCheckersOnBar = other.whiteCheckersOnBar;
+        blackCheckersOnBar = other.blackCheckersOnBar;
+    }
+
     public Point getPoint(int index)
     {
         if (index < 0 || index >= BOARD_SIZE)
         {
-            throw new IllegalArgumentException(
-                    "Main.Point index must be between 0 and "
-                            + (BOARD_SIZE - 1) + "."
-            );
+            throw new IllegalArgumentException("Point index must be between 0 and "
+                    + (BOARD_SIZE - 1) + ".");
         }
 
         return points[index];
@@ -62,42 +94,7 @@ public class Board
             return blackCheckersOnBar;
         }
 
-        throw new IllegalArgumentException(
-                "Main.Player must be WHITE or BLACK."
-        );
-    }
-
-    public void removeFromBar(Player player)
-    {
-        if (player == Player.WHITE)
-        {
-            if (whiteCheckersOnBar == 0)
-            {
-                throw new IllegalStateException(
-                        "White has no checkers on the bar."
-                );
-            }
-
-            whiteCheckersOnBar--;
-            return;
-        }
-
-        if (player == Player.BLACK)
-        {
-            if (blackCheckersOnBar == 0)
-            {
-                throw new IllegalStateException(
-                        "Black has no checkers on the bar."
-                );
-            }
-
-            blackCheckersOnBar--;
-            return;
-        }
-
-        throw new IllegalArgumentException(
-                "Main.Player must be WHITE or BLACK."
-        );
+        throw new IllegalArgumentException("Player must be WHITE or BLACK.");
     }
 
     public int getBorneOffCount(Player player)
@@ -112,9 +109,7 @@ public class Board
             return blackCheckersBorneOff;
         }
 
-        throw new IllegalArgumentException(
-                "Main.Player must be WHITE or BLACK."
-        );
+        throw new IllegalArgumentException("Player must be WHITE or BLACK.");
     }
 
     public boolean allCheckersInHomeBoard(Player player)
@@ -126,7 +121,7 @@ public class Board
 
         if (player == Player.WHITE)
         {
-            for (int i = 0; i < 18; i++)
+            for (int i = 0; i < WHITE_HOME_START; i++)
             {
                 if (points[i].getOwner() == Player.WHITE)
                 {
@@ -139,7 +134,7 @@ public class Board
 
         if (player == Player.BLACK)
         {
-            for (int i = 6; i < BOARD_SIZE; i++)
+            for (int i = BLACK_HOME_END; i < BOARD_SIZE; i++)
             {
                 if (points[i].getOwner() == Player.BLACK)
                 {
@@ -150,9 +145,34 @@ public class Board
             return true;
         }
 
-        throw new IllegalArgumentException(
-                "Main.Player must be WHITE or BLACK."
-        );
+        throw new IllegalArgumentException("Player must be WHITE or BLACK.");
+    }
+
+    public void removeFromBar(Player player)
+    {
+        if (player == Player.WHITE)
+        {
+            if (whiteCheckersOnBar == 0)
+            {
+                throw new IllegalStateException("White has no checkers on the bar.");
+            }
+
+            whiteCheckersOnBar--;
+            return;
+        }
+
+        if (player == Player.BLACK)
+        {
+            if (blackCheckersOnBar == 0)
+            {
+                throw new IllegalStateException("Black has no checkers on the bar.");
+            }
+
+            blackCheckersOnBar--;
+            return;
+        }
+
+        throw new IllegalArgumentException("Player must be WHITE or BLACK.");
     }
 
     public void applyMove(Move move)
@@ -192,16 +212,6 @@ public class Board
         destination.addChecker(move.getPlayer());
     }
 
-    public void printBoard()
-    {
-        for (int i = 0; i < BOARD_SIZE; i++)
-        {
-            System.out.println(
-                    "Main.Point " + i + ": " + points[i]
-            );
-        }
-    }
-
     private void addToBar(Player player)
     {
         if (player == Player.WHITE)
@@ -214,9 +224,7 @@ public class Board
         }
         else
         {
-            throw new IllegalArgumentException(
-                    "Main.Player must be WHITE or BLACK."
-            );
+            throw new IllegalArgumentException("Player must be WHITE or BLACK.");
         }
     }
 
@@ -232,16 +240,11 @@ public class Board
         }
         else
         {
-            throw new IllegalArgumentException(
-                    "Main.Player must be WHITE or BLACK."
-            );
+            throw new IllegalArgumentException("Player must be WHITE or BLACK.");
         }
     }
 
-    private void placeCheckers(
-            int pointIndex,
-            Player player,
-            int count)
+    private void placeCheckers(int pointIndex, Player player, int count)
     {
         for (int i = 0; i < count; i++)
         {
@@ -251,29 +254,14 @@ public class Board
 
     private void setUpStartingPosition()
     {
-        placeCheckers(0, Player.WHITE, 2);
-        placeCheckers(11, Player.WHITE, 5);
-        placeCheckers(16, Player.WHITE, 3);
-        placeCheckers(18, Player.WHITE, 5);
+        placeCheckers(WHITE_START_POINT_ONE, Player.WHITE, WHITE_START_COUNT_ONE);
+        placeCheckers(WHITE_START_POINT_TWO, Player.WHITE, WHITE_START_COUNT_TWO);
+        placeCheckers(WHITE_START_POINT_THREE, Player.WHITE, WHITE_START_COUNT_THREE);
+        placeCheckers(WHITE_START_POINT_FOUR, Player.WHITE, WHITE_START_COUNT_FOUR);
 
-        placeCheckers(23, Player.BLACK, 2);
-        placeCheckers(12, Player.BLACK, 5);
-        placeCheckers(7, Player.BLACK, 3);
-        placeCheckers(5, Player.BLACK, 5);
-    }
-
-    public Board(Board other)
-    {
-        points = new Point[BOARD_SIZE];
-
-        for (int i = 0; i < BOARD_SIZE; i++)
-        {
-            points[i] = new Point(other.points[i]);
-        }
-
-        this.whiteCheckersOnBar = other.whiteCheckersOnBar;
-        this.blackCheckersOnBar = other.blackCheckersOnBar;
-        this.whiteCheckersBorneOff = other.whiteCheckersBorneOff;
-        this.blackCheckersBorneOff = other.blackCheckersBorneOff;
+        placeCheckers(BLACK_START_POINT_ONE, Player.BLACK, BLACK_START_COUNT_ONE);
+        placeCheckers(BLACK_START_POINT_TWO, Player.BLACK, BLACK_START_COUNT_TWO);
+        placeCheckers(BLACK_START_POINT_THREE, Player.BLACK, BLACK_START_COUNT_THREE);
+        placeCheckers(BLACK_START_POINT_FOUR, Player.BLACK, BLACK_START_COUNT_FOUR);
     }
 }

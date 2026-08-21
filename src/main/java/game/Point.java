@@ -11,6 +11,12 @@ public class Point
         checkerCount = 0;
     }
 
+    public Point(Point other)
+    {
+        owner = other.owner;
+        checkerCount = other.checkerCount;
+    }
+
     public Player getOwner()
     {
         return owner;
@@ -30,10 +36,9 @@ public class Point
     {
         if (player == Player.NONE)
         {
-            throw new IllegalArgumentException(
-                    "A checker must belong to WHITE or BLACK."
-            );
+            throw new IllegalArgumentException("A checker must belong to WHITE or BLACK.");
         }
+
         if (isEmpty())
         {
             owner = player;
@@ -45,21 +50,20 @@ public class Point
         }
         else
         {
-            throw new IllegalStateException(
-                    "Cannot add a checker to a point owned by the opponent."
-            );
+            throw new IllegalStateException("Cannot add a checker to a point owned by the opponent.");
         }
     }
 
     public void removeChecker()
     {
-        if(isEmpty())
+        if (isEmpty())
         {
             throw new IllegalStateException("Cannot remove a checker from an empty point.");
         }
-        checkerCount --;
 
-        if(checkerCount == 0 )
+        checkerCount--;
+
+        if (checkerCount == 0)
         {
             owner = Player.NONE;
         }
@@ -74,11 +78,5 @@ public class Point
         }
 
         return owner + " x" + checkerCount;
-    }
-
-    public Point(Point other)
-    {
-        this.owner = other.owner;
-        this.checkerCount = other.checkerCount;
     }
 }

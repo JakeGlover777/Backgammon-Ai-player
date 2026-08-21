@@ -6,6 +6,9 @@ import java.util.List;
 public class MoveGenerator
 {
     private static final int BOARD_SIZE = 24;
+    private static final int MAX_DOUBLE_MOVES = 4;
+    private static final int WHITE_HOME_START = 18;
+    private static final int BLACK_HOME_END = 5;
 
     public List<Move> generateMoves(Board board, Player player, Dice dice)
     {
@@ -13,21 +16,11 @@ public class MoveGenerator
 
         if (board.getBarCount(player) > 0)
         {
-            generateBarEntryMove(
-                    moves,
-                    board,
-                    player,
-                    dice.getDieOne()
-            );
+            generateBarEntryMove(moves, board, player, dice.getDieOne());
 
             if (dice.getDieTwo() != dice.getDieOne())
             {
-                generateBarEntryMove(
-                        moves,
-                        board,
-                        player,
-                        dice.getDieTwo()
-                );
+                generateBarEntryMove(moves, board, player, dice.getDieTwo());
             }
 
             return moves;
@@ -48,79 +41,42 @@ public class MoveGenerator
         {
             Point point = board.getPoint(i);
 
-            if (point.getOwner() == player)
+            if (point.getOwner() != player)
             {
-                int destinationOne =
-                        i + (dice.getDieOne() * direction);
+                continue;
+            }
 
-                int destinationTwo =
-                        i + (dice.getDieTwo() * direction);
+            int destinationOne = i + (dice.getDieOne() * direction);
+            int destinationTwo = i + (dice.getDieTwo() * direction);
 
-                if (isOnBoard(destinationOne))
+            if (isOnBoard(destinationOne))
+            {
+                Point destination = board.getPoint(destinationOne);
+
+                if (isLegalDestination(destination, player))
                 {
-                    Point destination =
-                            board.getPoint(destinationOne);
+                    moves.add(new Move(player, i, destinationOne, dice.getDieOne()));
+                }
+            }
+            else if (canBearOff(board, player, i, dice.getDieOne()))
+            {
+                moves.add(new Move(player, i, dice.getDieOne()));
+            }
+
+            if (dice.getDieTwo() != dice.getDieOne())
+            {
+                if (isOnBoard(destinationTwo))
+                {
+                    Point destination = board.getPoint(destinationTwo);
 
                     if (isLegalDestination(destination, player))
                     {
-                        moves.add(
-                                new Move(
-                                        player,
-                                        i,
-                                        destinationOne,
-                                        dice.getDieOne()
-                                )
-                        );
+                        moves.add(new Move(player, i, destinationTwo, dice.getDieTwo()));
                     }
                 }
-                else if (canBearOff(
-                        board,
-                        player,
-                        i,
-                        dice.getDieOne()))
+                else if (canBearOff(board, player, i, dice.getDieTwo()))
                 {
-                    moves.add(
-                            new Move(
-                                    player,
-                                    i,
-                                    dice.getDieOne()
-                            )
-                    );
-                }
-
-                if (dice.getDieTwo() != dice.getDieOne())
-                {
-                    if (isOnBoard(destinationTwo))
-                    {
-                        Point destination =
-                                board.getPoint(destinationTwo);
-
-                        if (isLegalDestination(destination, player))
-                        {
-                            moves.add(
-                                    new Move(
-                                            player,
-                                            i,
-                                            destinationTwo,
-                                            dice.getDieTwo()
-                                    )
-                            );
-                        }
-                    }
-                    else if (canBearOff(
-                            board,
-                            player,
-                            i,
-                            dice.getDieTwo()))
-                    {
-                        moves.add(
-                                new Move(
-                                        player,
-                                        i,
-                                        dice.getDieTwo()
-                                )
-                        );
-                    }
+                    moves.add(new Move(player, i, dice.getDieTwo()));
                 }
             }
         }
@@ -128,10 +84,7 @@ public class MoveGenerator
         return moves;
     }
 
-    public List<MoveSequence> generateMoveSequences(
-            Board board,
-            Player player,
-            Dice dice)
+    public List<MoveSequence> generateMoveSequences(Board board, Player player, Dice dice)
     {
         List<MoveSequence> sequences = new ArrayList<>();
 
@@ -140,32 +93,14 @@ public class MoveGenerator
 
         if (dieOne == dieTwo)
         {
-            generateDoubleSequences(
-                    sequences,
-                    board,
-                    player,
-                    dieOne,
+            generateDoubleSequences(sequences, board, player, dieOne,
                     new MoveSequence(),
-                    4
-            );
+                    MAX_DOUBLE_MOVES);
         }
         else
         {
-            generateSequencesForOrder(
-                    sequences,
-                    board,
-                    player,
-                    dieOne,
-                    dieTwo
-            );
-
-            generateSequencesForOrder(
-                    sequences,
-                    board,
-                    player,
-                    dieTwo,
-                    dieOne
-            );
+            generateSequencesForOrder(sequences, board, player, dieOne, dieTwo);
+            generateSequencesForOrder(sequences, board, player, dieTwo, dieOne);
         }
 
         int maxMoves = 0;
@@ -179,22 +114,16 @@ public class MoveGenerator
         }
 
         int finalMaxMoves = maxMoves;
-
-        sequences.removeIf(
-                sequence -> sequence.size() < finalMaxMoves
-        );
+        sequences.removeIf(sequence -> sequence.size() < finalMaxMoves);
 
         if (maxMoves == 1 && dieOne != dieTwo)
         {
             int higherDie = Math.max(dieOne, dieTwo);
-
             boolean higherDieCanBeUsed = false;
 
             for (MoveSequence sequence : sequences)
             {
-                if (sequence.getMoves()
-                        .getFirst()
-                        .getDieValue() == higherDie)
+                if (sequence.getMoves().getFirst().getDieValue() == higherDie)
                 {
                     higherDieCanBeUsed = true;
                     break;
@@ -203,77 +132,48 @@ public class MoveGenerator
 
             if (higherDieCanBeUsed)
             {
-                sequences.removeIf(
-                        sequence ->
-                                sequence.getMoves()
-                                        .getFirst()
-                                        .getDieValue() != higherDie
-                );
+                sequences.removeIf(sequence ->
+                        sequence.getMoves().getFirst().getDieValue() != higherDie);
             }
         }
 
         return sequences;
     }
 
-    private void generateSequencesForOrder(
-            List<MoveSequence> sequences,
-            Board board,
-            Player player,
-            int firstDie,
-            int secondDie)
+    private void generateSequencesForOrder(List<MoveSequence> sequences, Board board,
+                                           Player player, int firstDie, int secondDie)
     {
-        List<Move> firstMoves =
-                generateMovesForDie(
-                        board,
-                        player,
-                        firstDie
-                );
+        List<Move> firstMoves = generateMovesForDie(board, player, firstDie);
 
         for (Move firstMove : firstMoves)
         {
             Board copiedBoard = new Board(board);
-
             copiedBoard.applyMove(firstMove);
 
-            List<Move> secondMoves =
-                    generateMovesForDie(
-                            copiedBoard,
-                            player,
-                            secondDie
-                    );
+            List<Move> secondMoves = generateMovesForDie(copiedBoard, player, secondDie);
 
             if (secondMoves.isEmpty())
             {
-                MoveSequence sequence =
-                        new MoveSequence();
-
+                MoveSequence sequence = new MoveSequence();
                 sequence.addMove(firstMove);
-
                 sequences.add(sequence);
             }
             else
             {
                 for (Move secondMove : secondMoves)
                 {
-                    MoveSequence sequence =
-                            new MoveSequence();
-
+                    MoveSequence sequence = new MoveSequence();
                     sequence.addMove(firstMove);
                     sequence.addMove(secondMove);
-
                     sequences.add(sequence);
                 }
             }
         }
     }
 
-    private void generateDoubleSequences(
-            List<MoveSequence> sequences,
-            Board board,
-            Player player,
-            int dieValue,
-            MoveSequence currentSequence,
-            int movesRemaining)
+    private void generateDoubleSequences(List<MoveSequence> sequences, Board board,
+                                         Player player, int dieValue, MoveSequence currentSequence,
+                                         int movesRemaining)
     {
         if (movesRemaining == 0)
         {
@@ -281,12 +181,7 @@ public class MoveGenerator
             return;
         }
 
-        List<Move> legalMoves =
-                generateMovesForDie(
-                        board,
-                        player,
-                        dieValue
-                );
+        List<Move> legalMoves = generateMovesForDie(board, player, dieValue);
 
         if (legalMoves.isEmpty())
         {
@@ -301,41 +196,23 @@ public class MoveGenerator
         for (Move move : legalMoves)
         {
             Board copiedBoard = new Board(board);
-
             copiedBoard.applyMove(move);
 
-            MoveSequence copiedSequence =
-                    new MoveSequence(currentSequence);
-
+            MoveSequence copiedSequence = new MoveSequence(currentSequence);
             copiedSequence.addMove(move);
 
-            generateDoubleSequences(
-                    sequences,
-                    copiedBoard,
-                    player,
-                    dieValue,
-                    copiedSequence,
-                    movesRemaining - 1
-            );
+            generateDoubleSequences(sequences, copiedBoard, player, dieValue,
+                    copiedSequence, movesRemaining - 1);
         }
     }
 
-    private List<Move> generateMovesForDie(
-            Board board,
-            Player player,
-            int dieValue)
+    private List<Move> generateMovesForDie(Board board, Player player, int dieValue)
     {
         List<Move> moves = new ArrayList<>();
 
         if (board.getBarCount(player) > 0)
         {
-            generateBarEntryMove(
-                    moves,
-                    board,
-                    player,
-                    dieValue
-            );
-
+            generateBarEntryMove(moves, board, player, dieValue);
             return moves;
         }
 
@@ -354,55 +231,32 @@ public class MoveGenerator
         {
             Point point = board.getPoint(i);
 
-            if (point.getOwner() == player)
+            if (point.getOwner() != player)
             {
-                int destination =
-                        i + (dieValue * direction);
+                continue;
+            }
 
-                if (isOnBoard(destination))
-                {
-                    Point destinationPoint =
-                            board.getPoint(destination);
+            int destination = i + (dieValue * direction);
 
-                    if (isLegalDestination(
-                            destinationPoint,
-                            player))
-                    {
-                        moves.add(
-                                new Move(
-                                        player,
-                                        i,
-                                        destination,
-                                        dieValue
-                                )
-                        );
-                    }
-                }
-                else if (canBearOff(
-                        board,
-                        player,
-                        i,
-                        dieValue))
+            if (isOnBoard(destination))
+            {
+                Point destinationPoint = board.getPoint(destination);
+
+                if (isLegalDestination(destinationPoint, player))
                 {
-                    moves.add(
-                            new Move(
-                                    player,
-                                    i,
-                                    dieValue
-                            )
-                    );
+                    moves.add(new Move(player, i, destination, dieValue));
                 }
+            }
+            else if (canBearOff(board, player, i, dieValue))
+            {
+                moves.add(new Move(player, i, dieValue));
             }
         }
 
         return moves;
     }
 
-    private void generateBarEntryMove(
-            List<Move> moves,
-            Board board,
-            Player player,
-            int dieValue)
+    private void generateBarEntryMove(List<Move> moves, Board board, Player player, int dieValue)
     {
         int destination;
 
@@ -415,39 +269,22 @@ public class MoveGenerator
             destination = BOARD_SIZE - dieValue;
         }
 
-        Point destinationPoint =
-                board.getPoint(destination);
+        Point destinationPoint = board.getPoint(destination);
 
-        if (isLegalDestination(
-                destinationPoint,
-                player))
+        if (isLegalDestination(destinationPoint, player))
         {
-            moves.add(
-                    new Move(
-                            player,
-                            destination,
-                            dieValue,
-                            true
-                    )
-            );
+            moves.add(new Move(player, destination, dieValue, true));
         }
     }
 
-    private boolean isLegalDestination(
-            Point destination,
-            Player player)
+    private boolean isLegalDestination(Point destination, Player player)
     {
         return destination.isEmpty()
                 || destination.getOwner() == player
-                || (destination.getOwner() != player
-                && destination.getCheckerCount() == 1);
+                || (destination.getOwner() != player && destination.getCheckerCount() == 1);
     }
 
-    private boolean canBearOff(
-            Board board,
-            Player player,
-            int fromPoint,
-            int dieValue)
+    private boolean canBearOff(Board board, Player player, int fromPoint, int dieValue)
     {
         if (!board.allCheckersInHomeBoard(player))
         {
@@ -458,8 +295,7 @@ public class MoveGenerator
 
         if (player == Player.WHITE)
         {
-            exactDieRequired =
-                    BOARD_SIZE - fromPoint;
+            exactDieRequired = BOARD_SIZE - fromPoint;
 
             if (dieValue == exactDieRequired)
             {
@@ -468,7 +304,7 @@ public class MoveGenerator
 
             if (dieValue > exactDieRequired)
             {
-                for (int i = 18; i < fromPoint; i++)
+                for (int i = WHITE_HOME_START; i < fromPoint; i++)
                 {
                     if (board.getPoint(i).getOwner() == player)
                     {
@@ -481,8 +317,7 @@ public class MoveGenerator
         }
         else
         {
-            exactDieRequired =
-                    fromPoint + 1;
+            exactDieRequired = fromPoint + 1;
 
             if (dieValue == exactDieRequired)
             {
@@ -491,7 +326,7 @@ public class MoveGenerator
 
             if (dieValue > exactDieRequired)
             {
-                for (int i = 5; i > fromPoint; i--)
+                for (int i = BLACK_HOME_END; i > fromPoint; i--)
                 {
                     if (board.getPoint(i).getOwner() == player)
                     {
@@ -508,7 +343,6 @@ public class MoveGenerator
 
     private boolean isOnBoard(int index)
     {
-        return index >= 0
-                && index < BOARD_SIZE;
+        return index >= 0 && index < BOARD_SIZE;
     }
 }

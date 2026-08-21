@@ -10,12 +10,12 @@ public class MoveSequence
 
     public MoveSequence()
     {
-        this.moves = new ArrayList<>();
+        moves = new ArrayList<>();
     }
 
     public MoveSequence(MoveSequence other)
     {
-        this.moves = new ArrayList<>(other.moves);
+        moves = new ArrayList<>(other.moves);
     }
 
     public void addMove(Move move)

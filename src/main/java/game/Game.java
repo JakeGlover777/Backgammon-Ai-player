@@ -2,15 +2,17 @@ package game;
 
 public class Game
 {
+    private static final int CHECKERS_PER_PLAYER = 15;
+
     private final Board board;
     private final Dice dice;
     private Player currentPlayer;
 
     public Game()
     {
-        this.board = new Board();
-        this.dice = new Dice();
-        this.currentPlayer = Player.WHITE;
+        board = new Board();
+        dice = new Dice();
+        currentPlayer = Player.WHITE;
     }
 
     public Board getBoard()
@@ -42,12 +44,12 @@ public class Game
 
     public Player getWinner()
     {
-        if (board.getBorneOffCount(Player.WHITE) == 15)
+        if (board.getBorneOffCount(Player.WHITE) == CHECKERS_PER_PLAYER)
         {
             return Player.WHITE;
         }
 
-        if (board.getBorneOffCount(Player.BLACK) == 15)
+        if (board.getBorneOffCount(Player.BLACK) == CHECKERS_PER_PLAYER)
         {
             return Player.BLACK;
         }

@@ -4,21 +4,30 @@ import java.util.Random;
 
 public class Dice
 {
+    private static final int NUMBER_OF_SIDES = 6;
+
+    private final Random random;
     private int dieOne;
     private int dieTwo;
-    private final Random random;
 
     public Dice()
     {
-        this.random = new Random();
-        this.dieOne = 0;
-        this.dieTwo = 0;
+        random = new Random();
+        dieOne = 0;
+        dieTwo = 0;
+    }
+
+    public Dice(int dieOne, int dieTwo)
+    {
+        random = new Random();
+        this.dieOne = dieOne;
+        this.dieTwo = dieTwo;
     }
 
     public void roll()
     {
-        dieOne = random.nextInt(6) + 1;
-        dieTwo = random.nextInt(6) + 1;
+        dieOne = random.nextInt(NUMBER_OF_SIDES) + 1;
+        dieTwo = random.nextInt(NUMBER_OF_SIDES) + 1;
     }
 
     public int getDieOne()
@@ -40,12 +49,5 @@ public class Dice
     public String toString()
     {
         return "Die 1: " + dieOne + " | Die 2: " + dieTwo;
-    }
-
-    public Dice(int dieOne, int dieTwo)
-    {
-        this.random = new Random();
-        this.dieOne = dieOne;
-        this.dieTwo = dieTwo;
     }
 }

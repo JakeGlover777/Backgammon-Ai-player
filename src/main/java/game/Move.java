@@ -35,9 +35,7 @@ public class Move
     {
         if (!enteringFromBar)
         {
-            throw new IllegalArgumentException(
-                    "This is only for bar-entry moves."
-            );
+            throw new IllegalArgumentException("This constructor is only for bar-entry moves.");
         }
 
         this.player = player;
@@ -83,17 +81,14 @@ public class Move
     {
         if (enteringFromBar)
         {
-            return player + ": BAR -> " + toPoint
-                    + " (Die: " + dieValue + ")";
+            return player + ": BAR -> " + toPoint + " (Die: " + dieValue + ")";
         }
 
         if (bearingOff)
         {
-            return player + ": " + fromPoint
-                    + " -> BEAR OFF (Die: " + dieValue + ")";
+            return player + ": " + fromPoint + " -> BEAR OFF (Die: " + dieValue + ")";
         }
 
-        return player + ": " + fromPoint + " -> " + toPoint
-                + " (Die: " + dieValue + ")";
+        return player + ": " + fromPoint + " -> " + toPoint + " (Die: " + dieValue + ")";
     }
 }
