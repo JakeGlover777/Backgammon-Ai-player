@@ -6,6 +6,7 @@ import game.Point;
 
 public class BoardEvaluator
 {
+    private static final int BOARD_SIZE = 24;
     private static final int BORNE_OFF_WEIGHT = 100;
     private static final int BAR_WEIGHT = 40;
     private static final int BLOT_WEIGHT = 8;
@@ -35,7 +36,7 @@ public class BoardEvaluator
     {
         int blots = 0;
 
-        for (int i = 0; i < 24; i++)
+        for (int i = 0; i < BOARD_SIZE; i++)
         {
             Point point = board.getPoint(i);
 
@@ -52,7 +53,7 @@ public class BoardEvaluator
     {
         int progress = 0;
 
-        for (int i = 0; i < 24; i++)
+        for (int i = 0; i < BOARD_SIZE; i++)
         {
             Point point = board.getPoint(i);
 
@@ -67,7 +68,7 @@ public class BoardEvaluator
             }
             else
             {
-                progress += (24 - i) * point.getCheckerCount();
+                progress += (BOARD_SIZE - i) * point.getCheckerCount();
             }
         }
 

@@ -11,6 +11,9 @@ import java.util.List;
 
 public class ExpectimaxAi implements AiPlayer
 {
+    private static final int DIE_SIDES = 6;
+    private static final double DICE_OUTCOMES = DIE_SIDES * DIE_SIDES;
+
     private final MoveGenerator moveGenerator;
     private final BoardEvaluator boardEvaluator;
 
@@ -56,9 +59,9 @@ public class ExpectimaxAi implements AiPlayer
         Player opponent = getOpponent(originalPlayer);
         double totalScore = 0;
 
-        for (int dieOne = 1; dieOne <= 6; dieOne++)
+        for (int dieOne = 1; dieOne <= DIE_SIDES; dieOne++)
         {
-            for (int dieTwo = 1; dieTwo <= 6; dieTwo++)
+            for (int dieTwo = 1; dieTwo <= DIE_SIDES; dieTwo++)
             {
                 Dice dice = new Dice(dieOne, dieTwo);
 
@@ -90,7 +93,7 @@ public class ExpectimaxAi implements AiPlayer
             }
         }
 
-        return totalScore / 36.0;
+        return totalScore / DICE_OUTCOMES;
     }
 
     private void applySequence(Board board, MoveSequence sequence)

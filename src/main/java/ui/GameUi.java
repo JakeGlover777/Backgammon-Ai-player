@@ -1,18 +1,7 @@
 package ui;
 
-import ai.AiPlayer;
-import ai.ExpectimaxAi;
-import ai.HeuristicAi;
-import ai.RandomAi;
-import game.Board;
-import game.Dice;
 import game.Game;
-import game.Move;
-import game.MoveGenerator;
-import game.MoveSequence;
-import game.Player;
 
-import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -24,24 +13,23 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class GameUi extends Application
 {
-    private Integer selectedPoint = null;
-    private List<MoveSequence> candidateSequences;
+    private static final String HUMAN = "Human";
+    private static final String RANDOM_AI = "Random AI";
+    private static final String HEURISTIC_AI = "Heuristic AI";
+    private static final String EXPECTIMAX_AI = "Expectimax AI";
 
-    private boolean diceRolled = false;
-    private int moveIndex = 0;
+    private static final double SETUP_SPACING = 15;
+    private static final double GAME_SPACING = 8;
+    private static final double SETUP_PADDING = 30;
+    private static final double GAME_PADDING = 20;
 
-    private String whitePlayerType;
-    private String blackPlayerType;
-    private boolean gameOver = false;
+    private static final double SETUP_WIDTH = 900;
+    private static final double SETUP_HEIGHT = 650;
+    private static final double GAME_WIDTH = 900;
+    private static final double GAME_HEIGHT = 720;
 
     @Override
     public void start(Stage stage)
@@ -52,1016 +40,104 @@ public class GameUi extends Application
     private void showSetupScreen(Stage stage)
     {
         Label title = new Label("Backgammon AI");
-
         Label whiteLabel = new Label("White Player");
+        Label blackLabel = new Label("Black Player");
 
-        ComboBox<String> whitePlayerBox =
-                new ComboBox<>();
+        ComboBox<String> whitePlayerBox = createPlayerSelection(HUMAN);
+        ComboBox<String> blackPlayerBox = createPlayerSelection(HEURISTIC_AI);
 
-        whitePlayerBox.getItems().addAll(
-                "Human",
-                "Random AI",
-                "Heuristic AI",
-                "Expectimax AI"
-        );
-
-        whitePlayerBox.setValue("Human");
-
-        Label blackLabel =
-                new Label("Black Player");
-
-        ComboBox<String> blackPlayerBox =
-                new ComboBox<>();
-
-        blackPlayerBox.getItems().addAll(
-                "Human",
-                "Random AI",
-                "Heuristic AI",
-                "Expectimax AI"
-        );
-
-        blackPlayerBox.setValue(
-                "Heuristic AI"
-        );
-
-        Button startButton =
-                new Button("Start Game");
-
+        Button startButton = new Button("Start Game");
         startButton.setOnAction(event ->
-                showGameScreen(
-                        stage,
-                        whitePlayerBox.getValue(),
-                        blackPlayerBox.getValue()
-                )
-        );
+                showGameScreen(stage, whitePlayerBox.getValue(), blackPlayerBox.getValue()));
 
-        VBox layout = new VBox(
-                15,
-                title,
-                whiteLabel,
-                whitePlayerBox,
-                blackLabel,
-                blackPlayerBox,
-                startButton
-        );
+        VBox layout = new VBox(SETUP_SPACING, title, whiteLabel, whitePlayerBox,
+                blackLabel, blackPlayerBox, startButton);
 
         layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(30));
+        layout.setPadding(new Insets(SETUP_PADDING));
 
-        Scene scene =
-                new Scene(layout, 900, 650);
+        Scene scene = new Scene(layout, SETUP_WIDTH, SETUP_HEIGHT);
 
         stage.setTitle("Backgammon AI");
         stage.setScene(scene);
         stage.show();
     }
 
-    private void showGameScreen(
-            Stage stage,
-            String whitePlayer,
-            String blackPlayer)
+    private ComboBox<String> createPlayerSelection(String defaultPlayer)
+    {
+        ComboBox<String> playerBox = new ComboBox<>();
+
+        playerBox.getItems().addAll(HUMAN, RANDOM_AI, HEURISTIC_AI, EXPECTIMAX_AI);
+        playerBox.setValue(defaultPlayer);
+
+        return playerBox;
+    }
+
+    private void showGameScreen(Stage stage, String whitePlayer, String blackPlayer)
     {
         Game game = new Game();
-
-        whitePlayerType = whitePlayer;
-        blackPlayerType = blackPlayer;
-        gameOver = false;
-
-        Board board =
-                game.getBoard();
-
-        MoveGenerator moveGenerator =
-                new MoveGenerator();
-
-        selectedPoint = null;
-        candidateSequences = null;
-        diceRolled = false;
-        moveIndex = 0;
+        BoardView boardView = new BoardView(game.getBoard());
 
         Label playerTypesLabel =
-                new Label(
-                        "White: "
-                                + whitePlayer
-                                + " | Black: "
-                                + blackPlayer
-                );
-
+                new Label("White: " + whitePlayer + " | Black: " + blackPlayer);
         Label currentPlayerLabel =
-                new Label(
-                        "Current Player: "
-                                + game.getCurrentPlayer()
-                );
+                new Label("Current Player: " + game.getCurrentPlayer());
+        Label diceLabel = new Label("Dice: - | -");
+        Label instructionLabel = new Label("Roll the dice.");
 
-        Label diceLabel =
-                new Label("Dice: - | -");
+        Button rollButton = new Button("Roll Dice");
+        Button backButton = new Button("Back");
 
-        Label instructionLabel =
-                new Label("Roll the dice.");
+        GameController controller = new GameController(
+                game,
+                boardView,
+                whitePlayer,
+                blackPlayer,
+                currentPlayerLabel::setText,
+                diceLabel::setText,
+                instructionLabel::setText);
 
-        Button rollButton =
-                new Button("Roll Dice");
-
-        BoardView boardView =
-                new BoardView(board);
-
-        rollButton.setOnAction(event ->
-        {
-            if (gameOver
-                    || diceRolled
-                    || isAiTurn(game))
-            {
-                return;
-            }
-
-            Dice dice =
-                    game.getDice();
-
-            dice.roll();
-
-            diceLabel.setText(
-                    "Dice: "
-                            + dice.getDieOne()
-                            + " | "
-                            + dice.getDieTwo()
-            );
-
-            candidateSequences =
-                    moveGenerator
-                            .generateMoveSequences(
-                                    board,
-                                    game.getCurrentPlayer(),
-                                    dice
-                            );
-
-            moveIndex = 0;
-            selectedPoint = null;
-
-            boardView.clearHighlights();
-
-            if (candidateSequences.isEmpty())
-            {
-                instructionLabel.setText(
-                        "No legal moves. Turn skipped."
-                );
-
-                game.switchPlayer();
-
-                currentPlayerLabel.setText(
-                        "Current Player: "
-                                + game.getCurrentPlayer()
-                );
-
-                diceLabel.setText(
-                        "Dice: - | -"
-                );
-
-                scheduleAiTurn(
-                        game,
-                        board,
-                        boardView,
-                        currentPlayerLabel,
-                        diceLabel,
-                        instructionLabel
-                );
-
-                return;
-            }
-
-            diceRolled = true;
-
-            if (currentMoveRequiresBarEntry())
-            {
-                instructionLabel.setText(
-                        "You have a checker on the bar. "
-                                + "Select it to re-enter."
-                );
-            }
-            else
-            {
-                instructionLabel.setText(
-                        "Select a checker."
-                );
-            }
-        });
-
-        boardView.setOnPointClicked(
-                pointIndex ->
-                {
-                    if (gameOver
-                            || isAiTurn(game)
-                            || !diceRolled
-                            || candidateSequences == null
-                            || candidateSequences.isEmpty())
-                    {
-                        return;
-                    }
-
-                    Player currentPlayer =
-                            game.getCurrentPlayer();
-
-                    if (currentMoveRequiresBarEntry())
-                    {
-                        int correctBar =
-                                currentPlayer
-                                        == Player.WHITE
-                                        ? BoardView.WHITE_BAR
-                                        : BoardView.BLACK_BAR;
-
-                        if (selectedPoint == null)
-                        {
-                            if (pointIndex
-                                    != correctBar)
-                            {
-                                instructionLabel.setText(
-                                        "You must enter your checker "
-                                                + "from the bar first."
-                                );
-
-                                return;
-                            }
-
-                            selectedPoint =
-                                    correctBar;
-
-                            Set<Integer> destinations =
-                                    findBarDestinations();
-
-                            boardView.highlightPoints(
-                                    destinations
-                            );
-
-                            instructionLabel.setText(
-                                    "Select a highlighted entry point."
-                            );
-
-                            return;
-                        }
-
-                        if (selectedPoint
-                                == correctBar)
-                        {
-                            Move selectedMove =
-                                    findBarMove(
-                                            pointIndex
-                                    );
-
-                            if (selectedMove != null)
-                            {
-                                applySelectedMove(
-                                        selectedMove,
-                                        game,
-                                        board,
-                                        boardView,
-                                        currentPlayerLabel,
-                                        diceLabel,
-                                        instructionLabel
-                                );
-
-                                return;
-                            }
-                        }
-
-                        instructionLabel.setText(
-                                "That is not a legal entry point."
-                        );
-
-                        return;
-                    }
-
-                    if (selectedPoint == null)
-                    {
-                        if (pointIndex < 0
-                                || board.getPoint(pointIndex)
-                                .getOwner()
-                                != currentPlayer)
-                        {
-                            instructionLabel.setText(
-                                    "Select one of your own checkers."
-                            );
-
-                            return;
-                        }
-
-                        Set<Integer> destinations =
-                                findDestinations(
-                                        pointIndex
-                                );
-
-                        if (destinations.isEmpty())
-                        {
-                            instructionLabel.setText(
-                                    "That checker cannot move."
-                            );
-
-                            return;
-                        }
-
-                        selectedPoint =
-                                pointIndex;
-
-                        boardView.highlightPoints(
-                                destinations
-                        );
-
-                        instructionLabel.setText(
-                                "Select a highlighted destination."
-                        );
-
-                        return;
-                    }
-
-                    if (pointIndex
-                            == BoardView.WHITE_BAR
-                            || pointIndex
-                            == BoardView.BLACK_BAR)
-                    {
-                        instructionLabel.setText(
-                                "Select a legal destination."
-                        );
-
-                        return;
-                    }
-
-                    Move selectedMove =
-                            findMove(
-                                    selectedPoint,
-                                    pointIndex
-                            );
-
-                    if (selectedMove != null)
-                    {
-                        applySelectedMove(
-                                selectedMove,
-                                game,
-                                board,
-                                boardView,
-                                currentPlayerLabel,
-                                diceLabel,
-                                instructionLabel
-                        );
-
-                        return;
-                    }
-
-                    if (pointIndex < 0)
-                    {
-                        instructionLabel.setText(
-                                "That is not a legal destination."
-                        );
-
-                        return;
-                    }
-
-                    if (board.getPoint(pointIndex)
-                            .getOwner()
-                            == currentPlayer)
-                    {
-                        Set<Integer> destinations =
-                                findDestinations(
-                                        pointIndex
-                                );
-
-                        if (!destinations.isEmpty())
-                        {
-                            selectedPoint =
-                                    pointIndex;
-
-                            boardView.highlightPoints(
-                                    destinations
-                            );
-
-                            instructionLabel.setText(
-                                    "Select a highlighted destination."
-                            );
-
-                            return;
-                        }
-                    }
-
-                    instructionLabel.setText(
-                            "That is not a legal destination."
-                    );
-                });
-
-        Button backButton =
-                new Button("Back");
+        rollButton.setOnAction(event -> controller.rollDice());
 
         backButton.setOnAction(event ->
-                showSetupScreen(stage)
-        );
+        {
+            controller.stop();
+            showSetupScreen(stage);
+        });
 
-        VBox topSection = new VBox(
-                8,
+        BorderPane layout = createGameLayout(
                 playerTypesLabel,
                 currentPlayerLabel,
                 diceLabel,
                 rollButton,
-                instructionLabel
-        );
+                instructionLabel,
+                boardView,
+                backButton);
 
-        topSection.setAlignment(
-                Pos.CENTER
-        );
+        Scene scene = new Scene(layout, GAME_WIDTH, GAME_HEIGHT);
+        stage.setScene(scene);
 
-        HBox bottomSection =
-                new HBox(backButton);
+        controller.start();
+    }
 
-        bottomSection.setAlignment(
-                Pos.CENTER
-        );
+    private BorderPane createGameLayout(Label playerTypesLabel, Label currentPlayerLabel,
+                                        Label diceLabel, Button rollButton, Label instructionLabel,
+                                        BoardView boardView, Button backButton)
+    {
+        VBox topSection = new VBox(GAME_SPACING, playerTypesLabel, currentPlayerLabel, diceLabel,
+                rollButton, instructionLabel);
 
-        BorderPane layout =
-                new BorderPane();
+        topSection.setAlignment(Pos.CENTER);
 
+        HBox bottomSection = new HBox(backButton);
+        bottomSection.setAlignment(Pos.CENTER);
+
+        BorderPane layout = new BorderPane();
         layout.setTop(topSection);
         layout.setCenter(boardView);
         layout.setBottom(bottomSection);
+        layout.setPadding(new Insets(GAME_PADDING));
 
-        layout.setPadding(
-                new Insets(20)
-        );
-
-        Scene scene =
-                new Scene(
-                        layout,
-                        900,
-                        720
-                );
-
-        stage.setScene(scene);
-
-        scheduleAiTurn(
-                game,
-                board,
-                boardView,
-                currentPlayerLabel,
-                diceLabel,
-                instructionLabel
-        );
-    }
-
-    private boolean isAiTurn(
-            Game game)
-    {
-        String playerType;
-
-        if (game.getCurrentPlayer()
-                == Player.WHITE)
-        {
-            playerType = whitePlayerType;
-        }
-        else
-        {
-            playerType = blackPlayerType;
-        }
-
-        return !"Human".equals(playerType);
-    }
-
-    private AiPlayer getAiPlayer(
-            Game game)
-    {
-        String playerType;
-
-        if (game.getCurrentPlayer()
-                == Player.WHITE)
-        {
-            playerType = whitePlayerType;
-        }
-        else
-        {
-            playerType = blackPlayerType;
-        }
-
-        if ("Random AI".equals(playerType))
-        {
-            return new RandomAi();
-        }
-
-        if ("Heuristic AI".equals(playerType))
-        {
-            return new HeuristicAi();
-        }
-
-        if ("Expectimax AI".equals(playerType))
-        {
-            return new ExpectimaxAi();
-        }
-
-        return null;
-    }
-
-    private void scheduleAiTurn(
-            Game game,
-            Board board,
-            BoardView boardView,
-            Label currentPlayerLabel,
-            Label diceLabel,
-            Label instructionLabel)
-    {
-        if (gameOver
-                || !isAiTurn(game))
-        {
-            return;
-        }
-
-        PauseTransition pause =
-                new PauseTransition(
-                        Duration.millis(500)
-                );
-
-        pause.setOnFinished(event ->
-                playAiTurn(
-                        game,
-                        board,
-                        boardView,
-                        currentPlayerLabel,
-                        diceLabel,
-                        instructionLabel
-                )
-        );
-
-        pause.play();
-    }
-
-    private void playAiTurn(
-            Game game,
-            Board board,
-            BoardView boardView,
-            Label currentPlayerLabel,
-            Label diceLabel,
-            Label instructionLabel)
-    {
-        if (gameOver)
-        {
-            return;
-        }
-
-        Player player =
-                game.getCurrentPlayer();
-
-        AiPlayer aiPlayer =
-                getAiPlayer(game);
-
-        if (aiPlayer == null)
-        {
-            return;
-        }
-
-        Dice dice =
-                game.getDice();
-
-        dice.roll();
-
-        diceLabel.setText(
-                "Dice: "
-                        + dice.getDieOne()
-                        + " | "
-                        + dice.getDieTwo()
-        );
-
-        instructionLabel.setText(
-                player
-                        + " AI is moving."
-        );
-
-        MoveSequence sequence =
-                aiPlayer.chooseMove(
-                        board,
-                        player,
-                        dice
-                );
-
-        if (!sequence.isEmpty())
-        {
-            for (Move move
-                    : sequence.getMoves())
-            {
-                board.applyMove(move);
-            }
-        }
-
-        boardView.clearHighlights();
-        boardView.refresh();
-
-        Player winner =
-                game.getWinner();
-
-        if (winner != Player.NONE)
-        {
-            gameOver = true;
-
-            currentPlayerLabel.setText(
-                    "Winner: " + winner
-            );
-
-            diceLabel.setText(
-                    "Dice: - | -"
-            );
-
-            instructionLabel.setText(
-                    winner + " wins the game!"
-            );
-
-            return;
-        }
-
-        game.switchPlayer();
-
-        currentPlayerLabel.setText(
-                "Current Player: "
-                        + game.getCurrentPlayer()
-        );
-
-        diceLabel.setText(
-                "Dice: - | -"
-        );
-
-        instructionLabel.setText(
-                "Turn complete."
-        );
-
-        scheduleAiTurn(
-                game,
-                board,
-                boardView,
-                currentPlayerLabel,
-                diceLabel,
-                instructionLabel
-        );
-    }
-
-    private void applySelectedMove(
-            Move selectedMove,
-            Game game,
-            Board board,
-            BoardView boardView,
-            Label currentPlayerLabel,
-            Label diceLabel,
-            Label instructionLabel)
-    {
-        board.applyMove(
-                selectedMove
-        );
-
-        filterSequences(
-                selectedMove
-        );
-
-        moveIndex++;
-        selectedPoint = null;
-
-        boardView.clearHighlights();
-        boardView.refresh();
-
-        Player winner =
-                game.getWinner();
-
-        if (winner != Player.NONE)
-        {
-            gameOver = true;
-
-            currentPlayerLabel.setText(
-                    "Winner: " + winner
-            );
-
-            diceLabel.setText(
-                    "Dice: - | -"
-            );
-
-            instructionLabel.setText(
-                    winner + " wins the game!"
-            );
-
-            diceRolled = false;
-            candidateSequences = null;
-            moveIndex = 0;
-
-            return;
-        }
-
-        if (turnIsComplete())
-        {
-            game.switchPlayer();
-
-            currentPlayerLabel.setText(
-                    "Current Player: "
-                            + game.getCurrentPlayer()
-            );
-
-            diceLabel.setText(
-                    "Dice: - | -"
-            );
-
-            instructionLabel.setText(
-                    "Turn complete. Roll the dice."
-            );
-
-            diceRolled = false;
-            candidateSequences = null;
-            moveIndex = 0;
-
-            scheduleAiTurn(
-                    game,
-                    board,
-                    boardView,
-                    currentPlayerLabel,
-                    diceLabel,
-                    instructionLabel
-            );
-
-            return;
-        }
-
-        if (currentMoveRequiresBarEntry())
-        {
-            instructionLabel.setText(
-                    "Select your checker on the bar."
-            );
-        }
-        else
-        {
-            instructionLabel.setText(
-                    "Select your next checker."
-            );
-        }
-    }
-
-    private Set<Integer> findDestinations(
-            int fromPoint)
-    {
-        Set<Integer> destinations =
-                new HashSet<>();
-
-        for (MoveSequence sequence
-                : candidateSequences)
-        {
-            if (sequence.size()
-                    <= moveIndex)
-            {
-                continue;
-            }
-
-            Move move =
-                    sequence.getMoves()
-                            .get(moveIndex);
-
-            if (move.isEnteringFromBar())
-            {
-                continue;
-            }
-
-            if (move.isBearingOff()
-                    && move.getFromPoint()
-                    == fromPoint)
-            {
-                int bearOffDestination =
-                        move.getPlayer()
-                                == Player.WHITE
-                                ? BoardView.WHITE_BEAR_OFF
-                                : BoardView.BLACK_BEAR_OFF;
-
-                destinations.add(
-                        bearOffDestination
-                );
-
-                continue;
-            }
-
-            if (move.getFromPoint()
-                    == fromPoint)
-            {
-                destinations.add(
-                        move.getToPoint()
-                );
-            }
-        }
-
-        return destinations;
-    }
-
-    private Move findMove(
-            int fromPoint,
-            int toPoint)
-    {
-        for (MoveSequence sequence
-                : candidateSequences)
-        {
-            if (sequence.size()
-                    <= moveIndex)
-            {
-                continue;
-            }
-
-            Move move =
-                    sequence.getMoves()
-                            .get(moveIndex);
-
-            if (move.isEnteringFromBar())
-            {
-                continue;
-            }
-
-            if (move.isBearingOff())
-            {
-                int bearOffDestination =
-                        move.getPlayer()
-                                == Player.WHITE
-                                ? BoardView.WHITE_BEAR_OFF
-                                : BoardView.BLACK_BEAR_OFF;
-
-                if (move.getFromPoint()
-                        == fromPoint
-                        && toPoint
-                        == bearOffDestination)
-                {
-                    return move;
-                }
-
-                continue;
-            }
-
-            if (move.getFromPoint()
-                    == fromPoint
-                    && move.getToPoint()
-                    == toPoint)
-            {
-                return move;
-            }
-        }
-
-        return null;
-    }
-
-    private Set<Integer> findBarDestinations()
-    {
-        Set<Integer> destinations =
-                new HashSet<>();
-
-        for (MoveSequence sequence
-                : candidateSequences)
-        {
-            if (sequence.size()
-                    <= moveIndex)
-            {
-                continue;
-            }
-
-            Move move =
-                    sequence.getMoves()
-                            .get(moveIndex);
-
-            if (move.isEnteringFromBar())
-            {
-                destinations.add(
-                        move.getToPoint()
-                );
-            }
-        }
-
-        return destinations;
-    }
-
-    private Move findBarMove(
-            int toPoint)
-    {
-        for (MoveSequence sequence
-                : candidateSequences)
-        {
-            if (sequence.size()
-                    <= moveIndex)
-            {
-                continue;
-            }
-
-            Move move =
-                    sequence.getMoves()
-                            .get(moveIndex);
-
-            if (move.isEnteringFromBar()
-                    && move.getToPoint()
-                    == toPoint)
-            {
-                return move;
-            }
-        }
-
-        return null;
-    }
-
-    private boolean currentMoveRequiresBarEntry()
-    {
-        if (candidateSequences == null)
-        {
-            return false;
-        }
-
-        for (MoveSequence sequence
-                : candidateSequences)
-        {
-            if (sequence.size()
-                    <= moveIndex)
-            {
-                continue;
-            }
-
-            Move move =
-                    sequence.getMoves()
-                            .get(moveIndex);
-
-            if (move.isEnteringFromBar())
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private void filterSequences(
-            Move selectedMove)
-    {
-        List<MoveSequence> filtered =
-                new ArrayList<>();
-
-        for (MoveSequence sequence
-                : candidateSequences)
-        {
-            if (sequence.size()
-                    <= moveIndex)
-            {
-                continue;
-            }
-
-            Move move =
-                    sequence.getMoves()
-                            .get(moveIndex);
-
-            if (movesMatch(
-                    move,
-                    selectedMove))
-            {
-                filtered.add(
-                        sequence
-                );
-            }
-        }
-
-        candidateSequences =
-                filtered;
-    }
-
-    private boolean movesMatch(
-            Move first,
-            Move second)
-    {
-        if (first.isEnteringFromBar()
-                != second.isEnteringFromBar())
-        {
-            return false;
-        }
-
-        if (first.isBearingOff()
-                != second.isBearingOff())
-        {
-            return false;
-        }
-
-        if (first.getDieValue()
-                != second.getDieValue())
-        {
-            return false;
-        }
-
-        if (!first.isEnteringFromBar()
-                && first.getFromPoint()
-                != second.getFromPoint())
-        {
-            return false;
-        }
-
-        if (!first.isBearingOff()
-                && first.getToPoint()
-                != second.getToPoint())
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    private boolean turnIsComplete()
-    {
-        for (MoveSequence sequence
-                : candidateSequences)
-        {
-            if (sequence.size()
-                    > moveIndex)
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return layout;
     }
 }
