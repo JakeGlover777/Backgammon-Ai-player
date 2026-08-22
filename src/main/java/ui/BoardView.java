@@ -109,30 +109,22 @@ public class BoardView extends Pane
 
     private void drawBearOffAreas()
     {
-        Rectangle blackArea = new Rectangle(
-                BEAR_OFF_MARGIN,
-                (BOARD_HEIGHT - BEAR_OFF_HEIGHT) / 2,
-                BEAR_OFF_WIDTH,
-                BEAR_OFF_HEIGHT);
+        Rectangle blackArea = new Rectangle(BEAR_OFF_MARGIN, (BOARD_HEIGHT - BEAR_OFF_HEIGHT) / 2,
+                BEAR_OFF_WIDTH, BEAR_OFF_HEIGHT);
 
-        blackArea.setFill(
-                highlightedPoints.contains(BLACK_BEAR_OFF)
-                        ? Color.GOLD
-                        : Color.LIGHTGRAY);
+        blackArea.setFill(highlightedPoints.contains(BLACK_BEAR_OFF)
+                        ? Color.GOLD : Color.LIGHTGRAY);
 
         blackArea.setStroke(Color.BLACK);
         blackArea.setOnMouseClicked(event -> handlePointClick(BLACK_BEAR_OFF));
 
-        Rectangle whiteArea = new Rectangle(
-                BOARD_WIDTH - BEAR_OFF_WIDTH - BEAR_OFF_MARGIN,
+        Rectangle whiteArea = new Rectangle(BOARD_WIDTH - BEAR_OFF_WIDTH - BEAR_OFF_MARGIN,
                 (BOARD_HEIGHT - BEAR_OFF_HEIGHT) / 2,
-                BEAR_OFF_WIDTH,
-                BEAR_OFF_HEIGHT);
+                BEAR_OFF_WIDTH, BEAR_OFF_HEIGHT);
 
         whiteArea.setFill(
                 highlightedPoints.contains(WHITE_BEAR_OFF)
-                        ? Color.GOLD
-                        : Color.LIGHTGRAY);
+                        ? Color.GOLD : Color.LIGHTGRAY);
 
         whiteArea.setStroke(Color.BLACK);
         whiteArea.setOnMouseClicked(event -> handlePointClick(WHITE_BEAR_OFF));
@@ -167,10 +159,9 @@ public class BoardView extends Pane
     {
         Polygon triangle = new Polygon();
 
-        triangle.getPoints().addAll(
-                x, 0.0,
-                x + POINT_WIDTH, 0.0,
-                x + (POINT_WIDTH / 2), POINT_HEIGHT);
+        triangle.getPoints().addAll(x, 0.0, x
+                        + POINT_WIDTH, 0.0, x
+                + (POINT_WIDTH / 2), POINT_HEIGHT);
 
         stylePoint(triangle, index);
 
@@ -181,10 +172,9 @@ public class BoardView extends Pane
     {
         Polygon triangle = new Polygon();
 
-        triangle.getPoints().addAll(
-                x, BOARD_HEIGHT,
-                x + POINT_WIDTH, BOARD_HEIGHT,
-                x + (POINT_WIDTH / 2), BOARD_HEIGHT - POINT_HEIGHT);
+        triangle.getPoints().addAll(x, BOARD_HEIGHT, x
+                        + POINT_WIDTH, BOARD_HEIGHT, x
+                + (POINT_WIDTH / 2), BOARD_HEIGHT - POINT_HEIGHT);
 
         stylePoint(triangle, index);
 

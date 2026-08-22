@@ -11,6 +11,10 @@ import game.Move;
 import game.MoveGenerator;
 import game.MoveSequence;
 import game.Player;
+import statistics.DecisionStatistics;
+import statistics.GameStatistics;
+import statistics.SearchStatistics;
+import statistics.StatisticsRecorder;
 
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
@@ -29,6 +33,7 @@ public class GameController
     private static final String EXPECTIMAX_AI = "Expectimax AI";
 
     private static final double AI_DELAY_MILLISECONDS = 500;
+    private static final int EXPECTIMAX_SEARCH_DEPTH = 2;
 
     private final Game game;
     private final Board board;
@@ -41,6 +46,9 @@ public class GameController
     private final Consumer<String> currentPlayerUpdater;
     private final Consumer<String> diceUpdater;
     private final Consumer<String> instructionUpdater;
+
+    private final StatisticsRecorder statisticsRecorder;
+    private final GameStatistics gameStatistics;
 
     private Integer selectedPoint;
     private List<MoveSequence> candidateSequences;
@@ -66,6 +74,9 @@ public class GameController
         this.instructionUpdater = instructionUpdater;
 
         moveGenerator = new MoveGenerator();
+
+        statisticsRecorder = new StatisticsRecorder();
+        gameStatistics = new GameStatistics(1, whitePlayerType, blackPlayerType);
 
         selectedPoint = null;
         candidateSequences = null;
@@ -104,9 +115,7 @@ public class GameController
 
         updateDiceLabel(dice);
 
-        candidateSequences = moveGenerator.generateMoveSequences(
-                board,
-                game.getCurrentPlayer(),
+        candidateSequences = moveGenerator.generateMoveSequences(board, game.getCurrentPlayer(),
                 dice);
 
         moveIndex = 0;
@@ -136,6 +145,8 @@ public class GameController
     {
         instructionUpdater.accept("No legal moves. Turn skipped.");
 
+        gameStatistics.incrementTurnCount();
+
         game.switchPlayer();
 
         updateCurrentPlayerLabel();
@@ -146,11 +157,7 @@ public class GameController
 
     private void handleBoardClick(int pointIndex)
     {
-        if (!active
-                || gameOver
-                || isAiTurn()
-                || !diceRolled
-                || candidateSequences == null
+        if (!active || gameOver || isAiTurn() || !diceRolled || candidateSequences == null
                 || candidateSequences.isEmpty())
         {
             return;
@@ -170,8 +177,7 @@ public class GameController
     private void handleBarSelection(int pointIndex, Player currentPlayer)
     {
         int correctBar = currentPlayer == Player.WHITE
-                ? BoardView.WHITE_BAR
-                : BoardView.BLACK_BAR;
+                ? BoardView.WHITE_BAR : BoardView.BLACK_BAR;
 
         if (selectedPoint == null)
         {
@@ -312,7 +318,7 @@ public class GameController
 
         if (EXPECTIMAX_AI.equals(playerType))
         {
-            return new ExpectimaxAi(2,10000);
+            return new ExpectimaxAi(EXPECTIMAX_SEARCH_DEPTH);
         }
 
         return null;
@@ -351,12 +357,29 @@ public class GameController
         updateDiceLabel(dice);
         instructionUpdater.accept(player + " AI is moving.");
 
+        int legalSequenceCount = moveGenerator.generateMoveSequences(board, player, dice).size();
+
+        long startTime = System.nanoTime();
+
         MoveSequence sequence = aiPlayer.chooseMove(board, player, dice);
+
+        long decisionTimeNanoseconds = System.nanoTime() - startTime;
+
+        SearchStatistics searchStatistics = createSearchStatistics(aiPlayer);
+
+        Dice recordedDice = new Dice(dice.getDieOne(), dice.getDieTwo());
+
+        DecisionStatistics decisionStatistics = new DecisionStatistics(player, getPlayerType(player),
+                recordedDice, legalSequenceCount, decisionTimeNanoseconds, searchStatistics);
+
+        gameStatistics.recordDecision(decisionStatistics);
 
         for (Move move : sequence.getMoves())
         {
             board.applyMove(move);
         }
+
+        gameStatistics.incrementTurnCount();
 
         boardView.clearHighlights();
         boardView.refresh();
@@ -378,6 +401,29 @@ public class GameController
         scheduleAiTurn();
     }
 
+    private SearchStatistics createSearchStatistics(AiPlayer aiPlayer)
+    {
+        if (!(aiPlayer instanceof ExpectimaxAi))
+        {
+            return null;
+        }
+
+        ExpectimaxAi expectimaxAi = (ExpectimaxAi) aiPlayer;
+
+        return new SearchStatistics(expectimaxAi.getNodesEvaluated(), expectimaxAi.getSearchDepth(),
+                expectimaxAi.getNodeBudget(), expectimaxAi.wasBudgetReached());
+    }
+
+    private String getPlayerType(Player player)
+    {
+        if (player == Player.WHITE)
+        {
+            return whitePlayerType;
+        }
+
+        return blackPlayerType;
+    }
+
     private void applySelectedMove(Move selectedMove)
     {
         board.applyMove(selectedMove);
@@ -393,6 +439,8 @@ public class GameController
 
         if (winner != Player.NONE)
         {
+            gameStatistics.incrementTurnCount();
+
             showWinner(winner);
             resetHumanTurnState();
             return;
@@ -400,6 +448,8 @@ public class GameController
 
         if (turnIsComplete())
         {
+            gameStatistics.incrementTurnCount();
+
             game.switchPlayer();
 
             updateCurrentPlayerLabel();
@@ -425,6 +475,9 @@ public class GameController
     private void showWinner(Player winner)
     {
         gameOver = true;
+
+        gameStatistics.setWinner(winner);
+        statisticsRecorder.recordGame(gameStatistics);
 
         currentPlayerUpdater.accept("Winner: " + winner);
         resetDiceLabel();
@@ -476,8 +529,7 @@ public class GameController
             if (move.isBearingOff() && move.getFromPoint() == fromPoint)
             {
                 int bearOffDestination = move.getPlayer() == Player.WHITE
-                        ? BoardView.WHITE_BEAR_OFF
-                        : BoardView.BLACK_BEAR_OFF;
+                        ? BoardView.WHITE_BEAR_OFF : BoardView.BLACK_BEAR_OFF;
 
                 destinations.add(bearOffDestination);
                 continue;
@@ -511,8 +563,7 @@ public class GameController
             if (move.isBearingOff())
             {
                 int bearOffDestination = move.getPlayer() == Player.WHITE
-                        ? BoardView.WHITE_BEAR_OFF
-                        : BoardView.BLACK_BEAR_OFF;
+                        ? BoardView.WHITE_BEAR_OFF : BoardView.BLACK_BEAR_OFF;
 
                 if (move.getFromPoint() == fromPoint && toPoint == bearOffDestination)
                 {

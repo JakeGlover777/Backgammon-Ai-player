@@ -78,11 +78,7 @@ public class ExpectimaxAi implements AiPlayer
             applySequence(simulatedBoard, sequence);
 
             Player opponent = getOpponent(player);
-            double score = calculateExpectedScore(
-                    simulatedBoard,
-                    opponent,
-                    player,
-                    searchDepth);
+            double score = calculateExpectedScore(simulatedBoard, opponent, player, searchDepth);
 
             if (score > bestScore)
             {
@@ -119,8 +115,8 @@ public class ExpectimaxAi implements AiPlayer
         return budgetReached;
     }
 
-    private double calculateExpectedScore(Board board, Player currentPlayer,
-                                          Player originalPlayer, int depthRemaining)
+    private double calculateExpectedScore(Board board, Player currentPlayer, Player originalPlayer,
+                                          int depthRemaining)
     {
         if (shouldStopSearch(depthRemaining))
         {
@@ -142,12 +138,8 @@ public class ExpectimaxAi implements AiPlayer
 
                 Dice dice = new Dice(dieOne, dieTwo);
 
-                totalScore += calculateDecisionScore(
-                        board,
-                        currentPlayer,
-                        originalPlayer,
-                        dice,
-                        depthRemaining);
+                totalScore += calculateDecisionScore(board, currentPlayer, originalPlayer,
+                        dice, depthRemaining);
 
                 outcomesEvaluated++;
             }
@@ -166,8 +158,8 @@ public class ExpectimaxAi implements AiPlayer
         return totalScore / outcomesEvaluated;
     }
 
-    private double calculateDecisionScore(Board board, Player currentPlayer,
-                                          Player originalPlayer, Dice dice, int depthRemaining)
+    private double calculateDecisionScore(Board board, Player currentPlayer, Player originalPlayer,
+                                          Dice dice, int depthRemaining)
     {
         if (hasReachedNodeBudget())
         {
@@ -182,28 +174,17 @@ public class ExpectimaxAi implements AiPlayer
 
         if (legalSequences.isEmpty())
         {
-            return calculateExpectedScore(
-                    board,
-                    getOpponent(currentPlayer),
-                    originalPlayer,
+            return calculateExpectedScore(board, getOpponent(currentPlayer), originalPlayer,
                     depthRemaining - 1);
         }
 
         if (currentPlayer == originalPlayer)
         {
-            return findMaximumScore(
-                    board,
-                    currentPlayer,
-                    originalPlayer,
-                    legalSequences,
+            return findMaximumScore(board, currentPlayer, originalPlayer, legalSequences,
                     depthRemaining);
         }
 
-        return findMinimumScore(
-                board,
-                currentPlayer,
-                originalPlayer,
-                legalSequences,
+        return findMinimumScore(board, currentPlayer, originalPlayer, legalSequences,
                 depthRemaining);
     }
 
@@ -223,11 +204,8 @@ public class ExpectimaxAi implements AiPlayer
             Board futureBoard = new Board(board);
             applySequence(futureBoard, sequence);
 
-            double score = calculateExpectedScore(
-                    futureBoard,
-                    getOpponent(currentPlayer),
-                    originalPlayer,
-                    depthRemaining - 1);
+            double score = calculateExpectedScore(futureBoard, getOpponent(currentPlayer),
+                    originalPlayer, depthRemaining - 1);
 
             if (score > bestScore)
             {
@@ -243,8 +221,8 @@ public class ExpectimaxAi implements AiPlayer
         return bestScore;
     }
 
-    private double findMinimumScore(Board board, Player currentPlayer,
-                                    Player originalPlayer, List<MoveSequence> legalSequences, int depthRemaining)
+    private double findMinimumScore(Board board, Player currentPlayer, Player originalPlayer,
+                                    List<MoveSequence> legalSequences, int depthRemaining)
     {
         double worstScore = Double.POSITIVE_INFINITY;
 
@@ -259,11 +237,8 @@ public class ExpectimaxAi implements AiPlayer
             Board futureBoard = new Board(board);
             applySequence(futureBoard, sequence);
 
-            double score = calculateExpectedScore(
-                    futureBoard,
-                    getOpponent(currentPlayer),
-                    originalPlayer,
-                    depthRemaining - 1);
+            double score = calculateExpectedScore(futureBoard, getOpponent(currentPlayer),
+                    originalPlayer, depthRemaining - 1);
 
             if (score < worstScore)
             {

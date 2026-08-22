@@ -1,0 +1,74 @@
+package statistics;
+
+import game.Player;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class GameStatistics
+{
+    private final int gameId;
+    private final String whitePlayerType;
+    private final String blackPlayerType;
+    private final List<DecisionStatistics> decisions;
+
+    private Player winner;
+    private int turnCount;
+
+    public GameStatistics(int gameId, String whitePlayerType, String blackPlayerType)
+    {
+        this.gameId = gameId;
+        this.whitePlayerType = whitePlayerType;
+        this.blackPlayerType = blackPlayerType;
+
+        decisions = new ArrayList<>();
+        winner = Player.NONE;
+        turnCount = 0;
+    }
+
+    public void recordDecision(DecisionStatistics decision)
+    {
+        decisions.add(decision);
+    }
+
+    public void incrementTurnCount()
+    {
+        turnCount++;
+    }
+
+    public void setWinner(Player winner)
+    {
+        this.winner = winner;
+    }
+
+    public int getGameId()
+    {
+        return gameId;
+    }
+
+    public String getWhitePlayerType()
+    {
+        return whitePlayerType;
+    }
+
+    public String getBlackPlayerType()
+    {
+        return blackPlayerType;
+    }
+
+    public Player getWinner()
+    {
+        return winner;
+    }
+
+    public int getTurnCount()
+    {
+        return turnCount;
+    }
+
+    public List<DecisionStatistics> getDecisions()
+    {
+        return Collections.unmodifiableList(decisions);
+    }
+}
