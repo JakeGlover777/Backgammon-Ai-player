@@ -312,7 +312,7 @@ public class GameController
 
         if (EXPECTIMAX_AI.equals(playerType))
         {
-            return new ExpectimaxAi();
+            return new ExpectimaxAi(2,10000);
         }
 
         return null;
