@@ -19,7 +19,7 @@ public class HumanTurnController
     private final Consumer<Move> moveHandler;
 
     private Integer selectedPoint;
-    private List<MoveSequence> candidateSequences;
+    private List<MoveSequence> remainingSequences;
     private int moveIndex;
 
     public HumanTurnController(Board board, BoardView boardView, Consumer<String> instructionUpdater,
@@ -31,13 +31,13 @@ public class HumanTurnController
         this.moveHandler = moveHandler;
 
         selectedPoint = null;
-        candidateSequences = null;
+        remainingSequences = null;
         moveIndex = 0;
     }
 
     public void startTurn(List<MoveSequence> sequences)
     {
-        candidateSequences = sequences;
+        remainingSequences = sequences;
         moveIndex = 0;
         selectedPoint = null;
 
@@ -56,7 +56,7 @@ public class HumanTurnController
 
     public void handleBoardClick(int pointIndex, Player currentPlayer)
     {
-        if (candidateSequences == null || candidateSequences.isEmpty())
+        if (remainingSequences == null || remainingSequences.isEmpty())
         {
             return;
         }
@@ -183,12 +183,12 @@ public class HumanTurnController
 
     public boolean currentMoveRequiresBarEntry()
     {
-        if (candidateSequences == null)
+        if (remainingSequences == null)
         {
             return false;
         }
 
-        for (MoveSequence sequence : candidateSequences)
+        for (MoveSequence sequence : remainingSequences)
         {
             if (sequence.size() <= moveIndex)
             {
@@ -208,7 +208,7 @@ public class HumanTurnController
 
     public boolean turnIsComplete()
     {
-        for (MoveSequence sequence : candidateSequences)
+        for (MoveSequence sequence : remainingSequences)
         {
             if (sequence.size() > moveIndex)
             {
@@ -222,7 +222,7 @@ public class HumanTurnController
     public void reset()
     {
         selectedPoint = null;
-        candidateSequences = null;
+        remainingSequences = null;
         moveIndex = 0;
 
         boardView.clearHighlights();
@@ -232,7 +232,7 @@ public class HumanTurnController
     {
         Set<Integer> destinations = new HashSet<>();
 
-        for (MoveSequence sequence : candidateSequences)
+        for (MoveSequence sequence : remainingSequences)
         {
             if (sequence.size() <= moveIndex)
             {
@@ -266,7 +266,7 @@ public class HumanTurnController
 
     private Move findMove(int fromPoint, int toPoint)
     {
-        for (MoveSequence sequence : candidateSequences)
+        for (MoveSequence sequence : remainingSequences)
         {
             if (sequence.size() <= moveIndex)
             {
@@ -306,7 +306,7 @@ public class HumanTurnController
     {
         Set<Integer> destinations = new HashSet<>();
 
-        for (MoveSequence sequence : candidateSequences)
+        for (MoveSequence sequence : remainingSequences)
         {
             if (sequence.size() <= moveIndex)
             {
@@ -326,7 +326,7 @@ public class HumanTurnController
 
     private Move findBarMove(int toPoint)
     {
-        for (MoveSequence sequence : candidateSequences)
+        for (MoveSequence sequence : remainingSequences)
         {
             if (sequence.size() <= moveIndex)
             {
@@ -348,7 +348,7 @@ public class HumanTurnController
     {
         List<MoveSequence> filtered = new ArrayList<>();
 
-        for (MoveSequence sequence : candidateSequences)
+        for (MoveSequence sequence : remainingSequences)
         {
             if (sequence.size() <= moveIndex)
             {
@@ -363,7 +363,7 @@ public class HumanTurnController
             }
         }
 
-        candidateSequences = filtered;
+        remainingSequences = filtered;
     }
 
     private boolean movesMatch(Move first, Move second)
