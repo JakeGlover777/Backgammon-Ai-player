@@ -1,6 +1,7 @@
 package statistics;
 
 import game.Player;
+import game.PlayerType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,14 +10,14 @@ import java.util.List;
 public class GameStatistics
 {
     private final int gameId;
-    private final String whitePlayerType;
-    private final String blackPlayerType;
+    private final PlayerType whitePlayerType;
+    private final PlayerType blackPlayerType;
     private final List<DecisionStatistics> decisions;
 
     private Player winner;
     private int turnCount;
 
-    public GameStatistics(int gameId, String whitePlayerType, String blackPlayerType)
+    public GameStatistics(int gameId, PlayerType whitePlayerType, PlayerType blackPlayerType)
     {
         this.gameId = gameId;
         this.whitePlayerType = whitePlayerType;
@@ -47,12 +48,12 @@ public class GameStatistics
         return gameId;
     }
 
-    public String getWhitePlayerType()
+    public PlayerType getWhitePlayerType()
     {
         return whitePlayerType;
     }
 
-    public String getBlackPlayerType()
+    public PlayerType getBlackPlayerType()
     {
         return blackPlayerType;
     }

@@ -1,6 +1,7 @@
 package ui;
 
 import game.Game;
+import game.PlayerType;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -16,11 +17,6 @@ import javafx.stage.Stage;
 
 public class GameUi extends Application
 {
-    private static final String HUMAN = "Human";
-    private static final String RANDOM_AI = "Random AI";
-    private static final String HEURISTIC_AI = "Heuristic AI";
-    private static final String EXPECTIMAX_AI = "Expectimax AI";
-
     private static final double SETUP_SPACING = 15;
     private static final double GAME_SPACING = 8;
     private static final double SETUP_PADDING = 30;
@@ -43,8 +39,8 @@ public class GameUi extends Application
         Label whiteLabel = new Label("White Player");
         Label blackLabel = new Label("Black Player");
 
-        ComboBox<String> whitePlayerBox = createPlayerSelection(HUMAN);
-        ComboBox<String> blackPlayerBox = createPlayerSelection(HEURISTIC_AI);
+        ComboBox<PlayerType> whitePlayerBox = createPlayerSelection(PlayerType.HUMAN);
+        ComboBox<PlayerType> blackPlayerBox = createPlayerSelection(PlayerType.HEURISTIC_AI);
 
         Button startButton = new Button("Start Game");
         startButton.setOnAction(event ->
@@ -63,25 +59,27 @@ public class GameUi extends Application
         stage.show();
     }
 
-    private ComboBox<String> createPlayerSelection(String defaultPlayer)
+    private ComboBox<PlayerType> createPlayerSelection(PlayerType defaultPlayer)
     {
-        ComboBox<String> playerBox = new ComboBox<>();
+        ComboBox<PlayerType> playerBox = new ComboBox<>();
 
-        playerBox.getItems().addAll(HUMAN, RANDOM_AI, HEURISTIC_AI, EXPECTIMAX_AI);
+        playerBox.getItems().addAll(PlayerType.values());
         playerBox.setValue(defaultPlayer);
 
         return playerBox;
     }
 
-    private void showGameScreen(Stage stage, String whitePlayer, String blackPlayer)
+    private void showGameScreen(Stage stage, PlayerType whitePlayer, PlayerType blackPlayer)
     {
         Game game = new Game();
         BoardView boardView = new BoardView(game.getBoard());
 
         Label playerTypesLabel =
                 new Label("White: " + whitePlayer + " | Black: " + blackPlayer);
+
         Label currentPlayerLabel =
                 new Label("Current Player: " + game.getCurrentPlayer());
+
         Label diceLabel = new Label("Dice: - | -");
         Label instructionLabel = new Label("Roll the dice.");
 
@@ -105,27 +103,8 @@ public class GameUi extends Application
             showSetupScreen(stage);
         });
 
-        BorderPane layout = createGameLayout(
-                playerTypesLabel,
-                currentPlayerLabel,
-                diceLabel,
-                rollButton,
-                instructionLabel,
-                boardView,
-                backButton);
-
-        Scene scene = new Scene(layout, GAME_WIDTH, GAME_HEIGHT);
-        stage.setScene(scene);
-
-        controller.start();
-    }
-
-    private BorderPane createGameLayout(Label playerTypesLabel, Label currentPlayerLabel,
-                                        Label diceLabel, Button rollButton, Label instructionLabel,
-                                        BoardView boardView, Button backButton)
-    {
-        VBox topSection = new VBox(GAME_SPACING, playerTypesLabel, currentPlayerLabel, diceLabel,
-                rollButton, instructionLabel);
+        VBox topSection = new VBox(GAME_SPACING, playerTypesLabel, currentPlayerLabel,
+                diceLabel, rollButton, instructionLabel);
 
         topSection.setAlignment(Pos.CENTER);
 
@@ -138,6 +117,9 @@ public class GameUi extends Application
         layout.setBottom(bottomSection);
         layout.setPadding(new Insets(GAME_PADDING));
 
-        return layout;
+        Scene scene = new Scene(layout, GAME_WIDTH, GAME_HEIGHT);
+        stage.setScene(scene);
+
+        controller.start();
     }
 }

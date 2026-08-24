@@ -2,17 +2,18 @@ package statistics;
 
 import game.Dice;
 import game.Player;
+import game.PlayerType;
 
 public class DecisionStatistics
 {
     private final Player player;
-    private final String aiType;
+    private final PlayerType aiType;
     private final Dice dice;
     private final int legalSequenceCount;
     private final long decisionTimeNanoseconds;
     private final SearchStatistics searchStatistics;
 
-    public DecisionStatistics(Player player, String aiType, Dice dice, int legalSequenceCount,
+    public DecisionStatistics(Player player, PlayerType aiType, Dice dice, int legalSequenceCount,
                               long decisionTimeNanoseconds, SearchStatistics searchStatistics)
     {
         this.player = player;
@@ -28,7 +29,7 @@ public class DecisionStatistics
         return player;
     }
 
-    public String getAiType()
+    public PlayerType getAiType()
     {
         return aiType;
     }
