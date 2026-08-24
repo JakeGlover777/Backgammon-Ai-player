@@ -2,7 +2,8 @@ package game;
 
 public class Move
 {
-    private static final int SPECIAL_POINT = -1;
+    private static final int BAR = -1;
+    private static final int BEAR_OFF = -1;
 
     private final Player player;
     private final int fromPoint;
@@ -25,7 +26,7 @@ public class Move
     {
         this.player = player;
         this.fromPoint = fromPoint;
-        this.toPoint = SPECIAL_POINT;
+        this.toPoint = BEAR_OFF;
         this.dieValue = dieValue;
         this.bearingOff = true;
         this.enteringFromBar = false;
@@ -39,7 +40,7 @@ public class Move
         }
 
         this.player = player;
-        this.fromPoint = SPECIAL_POINT;
+        this.fromPoint = BAR;
         this.toPoint = toPoint;
         this.dieValue = dieValue;
         this.bearingOff = false;
