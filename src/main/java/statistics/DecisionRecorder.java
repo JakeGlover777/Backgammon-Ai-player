@@ -32,8 +32,7 @@ public class DecisionRecorder
         SearchStatistics searchStatistics = createSearchStatistics(aiPlayer);
         Dice recordedDice = new Dice(dice.getDieOne(), dice.getDieTwo());
 
-        DecisionStatistics statistics = new DecisionStatistics(
-                player, playerType, recordedDice, legalSequenceCount,
+        DecisionStatistics statistics = new DecisionStatistics(player, playerType, recordedDice, legalSequenceCount,
                 decisionTimeNanoseconds, searchStatistics);
 
         return new DecisionResult(sequence, statistics);
@@ -48,10 +47,7 @@ public class DecisionRecorder
 
         ExpectimaxAi expectimaxAi = (ExpectimaxAi) aiPlayer;
 
-        return new SearchStatistics(
-                expectimaxAi.getNodesEvaluated(),
-                expectimaxAi.getSearchDepth(),
-                expectimaxAi.getNodeBudget(),
-                expectimaxAi.wasBudgetReached());
+        return new SearchStatistics(expectimaxAi.getNodesEvaluated(), expectimaxAi.getSearchDepth(),
+                expectimaxAi.getNodeBudget(), expectimaxAi.wasBudgetReached());
     }
 }
