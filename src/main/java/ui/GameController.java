@@ -1,9 +1,5 @@
 package ui;
 
-import ai.AiPlayer;
-import ai.ExpectimaxAi;
-import ai.HeuristicAi;
-import ai.RandomAi;
 import game.Board;
 import game.Dice;
 import game.Game;
@@ -12,11 +8,7 @@ import game.MoveGenerator;
 import game.MoveSequence;
 import game.Player;
 import game.PlayerType;
-import javafx.animation.PauseTransition;
-import javafx.util.Duration;
-import statistics.DecisionStatistics;
 import statistics.GameStatistics;
-import statistics.SearchStatistics;
 import statistics.StatisticsRecorder;
 
 import java.util.List;
@@ -24,17 +16,12 @@ import java.util.function.Consumer;
 
 public class GameController
 {
-    private static final double AI_DELAY_MILLISECONDS = 500;
-    private static final int EXPECTIMAX_SEARCH_DEPTH = 2;
-
     private final Game game;
     private final Board board;
     private final MoveGenerator moveGenerator;
     private final BoardView boardView;
     private final HumanTurnController humanTurnController;
-
-    private final PlayerType whitePlayerType;
-    private final PlayerType blackPlayerType;
+    private final AiTurnController aiTurnController;
 
     private final Consumer<String> currentPlayerUpdater;
     private final Consumer<String> diceUpdater;
@@ -47,8 +34,6 @@ public class GameController
     private boolean gameOver;
     private boolean active;
 
-    private PauseTransition aiPause;
-
     public GameController(Game game, BoardView boardView, PlayerType whitePlayerType,
                           PlayerType blackPlayerType, Consumer<String> currentPlayerUpdater,
                           Consumer<String> diceUpdater, Consumer<String> instructionUpdater)
@@ -56,8 +41,6 @@ public class GameController
         this.game = game;
         this.board = game.getBoard();
         this.boardView = boardView;
-        this.whitePlayerType = whitePlayerType;
-        this.blackPlayerType = blackPlayerType;
         this.currentPlayerUpdater = currentPlayerUpdater;
         this.diceUpdater = diceUpdater;
         this.instructionUpdater = instructionUpdater;
@@ -74,6 +57,9 @@ public class GameController
         humanTurnController = new HumanTurnController(
                 board, boardView, instructionUpdater, this::applySelectedMove);
 
+        aiTurnController = new AiTurnController(
+                game, whitePlayerType, blackPlayerType, diceUpdater, instructionUpdater);
+
         boardView.setOnPointClicked(this::handleBoardClick);
     }
 
@@ -85,16 +71,12 @@ public class GameController
     public void stop()
     {
         active = false;
-
-        if (aiPause != null)
-        {
-            aiPause.stop();
-        }
+        aiTurnController.stop();
     }
 
     public void rollDice()
     {
-        if (!active || gameOver || diceRolled || isAiTurn())
+        if (!active || gameOver || diceRolled || aiTurnController.isAiTurn())
         {
             return;
         }
@@ -119,6 +101,11 @@ public class GameController
 
     private void handleNoLegalMoves()
     {
+        if (!active || gameOver)
+        {
+            return;
+        }
+
         instructionUpdater.accept("No legal moves. Turn skipped.");
 
         gameStatistics.incrementTurnCount();
@@ -127,13 +114,14 @@ public class GameController
 
         updateCurrentPlayerLabel();
         resetDiceLabel();
+        resetHumanTurnState();
 
         scheduleAiTurn();
     }
 
     private void handleBoardClick(int pointIndex)
     {
-        if (!active || gameOver || isAiTurn() || !diceRolled)
+        if (!active || gameOver || aiTurnController.isAiTurn() || !diceRolled)
         {
             return;
         }
@@ -141,87 +129,28 @@ public class GameController
         humanTurnController.handleBoardClick(pointIndex, game.getCurrentPlayer());
     }
 
-    private boolean isAiTurn()
-    {
-        return getPlayerType(game.getCurrentPlayer()) != PlayerType.HUMAN;
-    }
-
-    private AiPlayer getAiPlayer()
-    {
-        PlayerType playerType = getPlayerType(game.getCurrentPlayer());
-
-        return switch (playerType)
-        {
-            case RANDOM_AI -> new RandomAi();
-            case HEURISTIC_AI -> new HeuristicAi();
-            case EXPECTIMAX_AI -> new ExpectimaxAi(EXPECTIMAX_SEARCH_DEPTH);
-            case HUMAN -> null;
-        };
-    }
-
     private void scheduleAiTurn()
-    {
-        if (!active || gameOver || !isAiTurn())
-        {
-            return;
-        }
-
-        aiPause = new PauseTransition(Duration.millis(AI_DELAY_MILLISECONDS));
-        aiPause.setOnFinished(event -> playAiTurn());
-        aiPause.play();
-    }
-
-    private void playAiTurn()
     {
         if (!active || gameOver)
         {
             return;
         }
 
-        Player player = game.getCurrentPlayer();
-        AiPlayer aiPlayer = getAiPlayer();
+        aiTurnController.scheduleTurn(
+                this::completeAiTurn,
+                this::handleNoLegalMoves);
+    }
 
-        if (aiPlayer == null)
+    private void completeAiTurn(AiTurnController.AiTurnResult result)
+    {
+        if (!active || gameOver)
         {
             return;
         }
 
-        Dice dice = game.getDice();
-        dice.roll();
+        gameStatistics.recordDecision(result.statistics());
 
-        updateDiceLabel(dice);
-        instructionUpdater.accept(player + " AI is moving.");
-
-        int legalSequenceCount = moveGenerator.generateMoveSequences(
-                board, player, dice).size();
-
-        if (legalSequenceCount == 0)
-        {
-            handleNoLegalMoves();
-            return;
-        }
-
-        long startTime = System.nanoTime();
-
-        MoveSequence sequence = aiPlayer.chooseMove(board, player, dice);
-
-        long decisionTimeNanoseconds = System.nanoTime() - startTime;
-
-        SearchStatistics searchStatistics = createSearchStatistics(aiPlayer);
-
-        Dice recordedDice = new Dice(dice.getDieOne(), dice.getDieTwo());
-
-        DecisionStatistics decisionStatistics = new DecisionStatistics(
-                player,
-                getPlayerType(player),
-                recordedDice,
-                legalSequenceCount,
-                decisionTimeNanoseconds,
-                searchStatistics);
-
-        gameStatistics.recordDecision(decisionStatistics);
-
-        for (Move move : sequence.getMoves())
+        for (Move move : result.sequence().getMoves())
         {
             board.applyMove(move);
         }
@@ -246,27 +175,6 @@ public class GameController
         instructionUpdater.accept("Turn complete.");
 
         scheduleAiTurn();
-    }
-
-    private SearchStatistics createSearchStatistics(AiPlayer aiPlayer)
-    {
-        if (!(aiPlayer instanceof ExpectimaxAi))
-        {
-            return null;
-        }
-
-        ExpectimaxAi expectimaxAi = (ExpectimaxAi) aiPlayer;
-
-        return new SearchStatistics(
-                expectimaxAi.getNodesEvaluated(),
-                expectimaxAi.getSearchDepth(),
-                expectimaxAi.getNodeBudget(),
-                expectimaxAi.wasBudgetReached());
-    }
-
-    private PlayerType getPlayerType(Player player)
-    {
-        return player == Player.WHITE ? whitePlayerType : blackPlayerType;
     }
 
     private void applySelectedMove(Move selectedMove)
