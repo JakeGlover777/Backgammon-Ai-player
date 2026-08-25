@@ -13,8 +13,9 @@ import game.Player;
 import game.PlayerType;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
+import statistics.DecisionRecorder;
+import statistics.DecisionResult;
 import statistics.DecisionStatistics;
-import statistics.SearchStatistics;
 
 import java.util.function.Consumer;
 
@@ -26,6 +27,7 @@ public class AiTurnController
     private final Game game;
     private final Board board;
     private final MoveGenerator moveGenerator;
+    private final DecisionRecorder decisionRecorder;
 
     private final PlayerType whitePlayerType;
     private final PlayerType blackPlayerType;
@@ -47,6 +49,7 @@ public class AiTurnController
         this.instructionUpdater = instructionUpdater;
 
         moveGenerator = new MoveGenerator();
+        decisionRecorder = new DecisionRecorder();
 
         active = true;
     }
@@ -56,7 +59,8 @@ public class AiTurnController
         return getPlayerType(game.getCurrentPlayer()) != PlayerType.HUMAN;
     }
 
-    public void scheduleTurn(Consumer<AiTurnResult> turnCompleteHandler, Runnable noLegalMovesHandler)
+    public void scheduleTurn(Consumer<AiTurnResult> turnCompleteHandler,
+                             Runnable noLegalMovesHandler)
     {
         if (!active || !isAiTurn())
         {
@@ -112,22 +116,15 @@ public class AiTurnController
             return;
         }
 
-        long startTime = System.nanoTime();
+        DecisionResult decisionResult = decisionRecorder.recordDecision(
+                board, player, dice, aiPlayer, getPlayerType(player));
 
-        MoveSequence sequence = aiPlayer.chooseMove(board, player, dice);
+        DecisionStatistics statistics = decisionResult.getStatistics();
 
-        long decisionTimeNanoseconds = System.nanoTime() - startTime;
+        AiTurnResult turnResult = new AiTurnResult(
+                decisionResult.getMoveSequence(), statistics);
 
-        SearchStatistics searchStatistics = createSearchStatistics(aiPlayer);
-
-        Dice recordedDice = new Dice(dice.getDieOne(), dice.getDieTwo());
-
-        DecisionStatistics decisionStatistics = new DecisionStatistics(player, getPlayerType(player),
-                recordedDice, legalSequenceCount, decisionTimeNanoseconds, searchStatistics);
-
-        AiTurnResult result = new AiTurnResult(sequence, decisionStatistics);
-
-        turnCompleteHandler.accept(result);
+        turnCompleteHandler.accept(turnResult);
     }
 
     private AiPlayer getAiPlayer()
@@ -141,19 +138,6 @@ public class AiTurnController
             case EXPECTIMAX_AI -> new ExpectimaxAi(EXPECTIMAX_SEARCH_DEPTH);
             case HUMAN -> null;
         };
-    }
-
-    private SearchStatistics createSearchStatistics(AiPlayer aiPlayer)
-    {
-        if (!(aiPlayer instanceof ExpectimaxAi))
-        {
-            return null;
-        }
-
-        ExpectimaxAi expectimaxAi = (ExpectimaxAi) aiPlayer;
-
-        return new SearchStatistics(expectimaxAi.getNodesEvaluated(), expectimaxAi.getSearchDepth(),
-                expectimaxAi.getNodeBudget(), expectimaxAi.wasBudgetReached());
     }
 
     private PlayerType getPlayerType(Player player)
