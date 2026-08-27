@@ -14,3 +14,5 @@ lib/
 # OS files
 .DS_Store
 Thumbs.db
+
+experiment-output/
