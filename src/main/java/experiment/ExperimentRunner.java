@@ -18,14 +18,37 @@ import statistics.StatisticsRecorder;
 
 public class ExperimentRunner
 {
-    private static final int EXPECTIMAX_SEARCH_DEPTH = 2;
-    private static final int EXPECTIMAX_NODE_BUDGET = 10_000;
+    private static final int DEFAULT_EXPECTIMAX_SEARCH_DEPTH = 2;
+    private static final int DEFAULT_EXPECTIMAX_NODE_BUDGET = 10_000;
 
     private final DecisionRecorder decisionRecorder;
     private final StatisticsRecorder statisticsRecorder;
 
+    private final int expectimaxSearchDepth;
+    private final int expectimaxNodeBudget;
+
     public ExperimentRunner()
     {
+        this(DEFAULT_EXPECTIMAX_SEARCH_DEPTH, DEFAULT_EXPECTIMAX_NODE_BUDGET);
+    }
+
+    public ExperimentRunner(int expectimaxSearchDepth, int expectimaxNodeBudget)
+    {
+        if (expectimaxSearchDepth < 1)
+        {
+            throw new IllegalArgumentException(
+                    "Expectimax search depth must be at least 1.");
+        }
+
+        if (expectimaxNodeBudget < 1)
+        {
+            throw new IllegalArgumentException(
+                    "Expectimax node budget must be at least 1.");
+        }
+
+        this.expectimaxSearchDepth = expectimaxSearchDepth;
+        this.expectimaxNodeBudget = expectimaxNodeBudget;
+
         decisionRecorder = new DecisionRecorder();
         statisticsRecorder = new StatisticsRecorder();
     }
@@ -34,7 +57,8 @@ public class ExperimentRunner
     {
         if (numberOfGames < 1)
         {
-            throw new IllegalArgumentException("Number of games must be at least 1.");
+            throw new IllegalArgumentException(
+                    "Number of games must be at least 1.");
         }
 
         validateAiType(firstAi);
@@ -58,8 +82,7 @@ public class ExperimentRunner
                 blackPlayerType = firstAi;
             }
 
-            GameStatistics gameStatistics = runGame(
-                    gameId, whitePlayerType, blackPlayerType);
+            GameStatistics gameStatistics = runGame(gameId, whitePlayerType, blackPlayerType);
 
             statisticsRecorder.recordGame(gameStatistics);
         }
@@ -76,13 +99,18 @@ public class ExperimentRunner
 
         GameStatistics gameStatistics = new GameStatistics(gameId, whitePlayerType, blackPlayerType);
 
+        AiPlayer whiteAi = createAiPlayer(whitePlayerType);
+        AiPlayer blackAi = createAiPlayer(blackPlayerType);
+
         while (game.getWinner() == Player.NONE)
         {
             Player player = game.getCurrentPlayer();
 
             PlayerType playerType = getPlayerType(player, whitePlayerType, blackPlayerType);
 
-            AiPlayer aiPlayer = createAiPlayer(playerType);
+            AiPlayer aiPlayer = player == Player.WHITE
+                    ? whiteAi
+                    : blackAi;
 
             dice.roll();
 
@@ -121,7 +149,9 @@ public class ExperimentRunner
     private PlayerType getPlayerType(Player player, PlayerType whitePlayerType,
                                      PlayerType blackPlayerType)
     {
-        return player == Player.WHITE ? whitePlayerType : blackPlayerType;
+        return player == Player.WHITE
+                ? whitePlayerType
+                : blackPlayerType;
     }
 
     private AiPlayer createAiPlayer(PlayerType playerType)
@@ -131,7 +161,7 @@ public class ExperimentRunner
             case RANDOM_AI -> new RandomAi();
             case HEURISTIC_AI -> new HeuristicAi();
             case EXPECTIMAX_AI -> new ExpectimaxAi(
-                    EXPECTIMAX_SEARCH_DEPTH, EXPECTIMAX_NODE_BUDGET);
+                    expectimaxSearchDepth, expectimaxNodeBudget);
             case HUMAN -> throw new IllegalArgumentException(
                     "Experiments require AI players.");
         };

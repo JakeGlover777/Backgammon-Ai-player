@@ -132,4 +132,20 @@ class ExperimentRunnerTest
                         PlayerType.HEURISTIC_AI,
                         0));
     }
+
+    @Test
+    void rejectsInvalidExpectimaxDepth()
+    {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new ExperimentRunner(0, 10_000));
+    }
+
+    @Test
+    void rejectsInvalidExpectimaxNodeBudget()
+    {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new ExperimentRunner(2, 0));
+    }
 }
