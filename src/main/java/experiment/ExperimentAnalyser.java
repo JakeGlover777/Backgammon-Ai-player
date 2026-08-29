@@ -21,6 +21,21 @@ public class ExperimentAnalyser
         return statisticsRecorder.getGameCount();
     }
 
+    public int getIncompleteGames()
+    {
+        int count = 0;
+
+        for (GameStatistics game : statisticsRecorder.getGames())
+        {
+            if (game.getWinner() == Player.NONE)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     public int getWins(PlayerType playerType)
     {
         int wins = 0;
@@ -36,14 +51,16 @@ public class ExperimentAnalyser
         return wins;
     }
 
-    public double getWinRate(PlayerType playerType)
+    public double getWinRate(PlayerType aiType)
     {
-        if (getTotalGames() == 0)
+        int completedGames = getTotalGames() - getIncompleteGames();
+
+        if (completedGames == 0)
         {
             return 0;
         }
 
-        return (double) getWins(playerType) / getTotalGames() * 100;
+        return (double) getWins(aiType) / completedGames * 100;
     }
 
     public int getWhiteWins()

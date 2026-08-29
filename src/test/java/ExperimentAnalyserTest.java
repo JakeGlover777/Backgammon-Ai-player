@@ -296,6 +296,10 @@ class ExperimentAnalyserTest
                 0.0,
                 analyser.getBudgetReachedPercentage(),
                 0.001);
+
+        assertEquals(
+                0,
+                analyser.getIncompleteGames());
     }
 
     private GameStatistics createGame(int gameId, PlayerType whitePlayerType,
@@ -313,5 +317,62 @@ class ExperimentAnalyserTest
         game.setWinner(winner);
 
         return game;
+    }
+
+    @Test
+    void shouldCountIncompleteGames()
+    {
+        recorder.recordGame(createGame(
+                1,
+                PlayerType.HEURISTIC_AI,
+                PlayerType.EXPECTIMAX_AI,
+                Player.NONE,
+                1000));
+
+        recorder.recordGame(createGame(
+                2,
+                PlayerType.EXPECTIMAX_AI,
+                PlayerType.HEURISTIC_AI,
+                Player.WHITE,
+                60));
+
+        assertEquals(
+                1,
+                analyser.getIncompleteGames());
+    }
+
+    @Test
+    void shouldExcludeIncompleteGamesFromWinRate()
+    {
+        recorder.recordGame(createGame(
+                1,
+                PlayerType.HEURISTIC_AI,
+                PlayerType.EXPECTIMAX_AI,
+                Player.WHITE,
+                50));
+
+        recorder.recordGame(createGame(
+                2,
+                PlayerType.EXPECTIMAX_AI,
+                PlayerType.HEURISTIC_AI,
+                Player.WHITE,
+                60));
+
+        recorder.recordGame(createGame(
+                3,
+                PlayerType.HEURISTIC_AI,
+                PlayerType.EXPECTIMAX_AI,
+                Player.NONE,
+                1000));
+
+        assertEquals(
+                50.0,
+                analyser.getWinRate(PlayerType.HEURISTIC_AI),
+                0.001);
+
+        assertEquals(
+                50.0,
+                analyser.getWinRate(PlayerType.EXPECTIMAX_AI),
+                0.001);
     }
 }

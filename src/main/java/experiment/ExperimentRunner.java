@@ -20,6 +20,7 @@ public class ExperimentRunner
 {
     private static final int DEFAULT_EXPECTIMAX_SEARCH_DEPTH = 2;
     private static final int DEFAULT_EXPECTIMAX_NODE_BUDGET = 10_000;
+    private static final int MAX_TURNS = 1000;
 
     private final DecisionRecorder decisionRecorder;
     private final StatisticsRecorder statisticsRecorder;
@@ -36,14 +37,12 @@ public class ExperimentRunner
     {
         if (expectimaxSearchDepth < 1)
         {
-            throw new IllegalArgumentException(
-                    "Expectimax search depth must be at least 1.");
+            throw new IllegalArgumentException("Expectimax search depth must be at least 1.");
         }
 
         if (expectimaxNodeBudget < 1)
         {
-            throw new IllegalArgumentException(
-                    "Expectimax node budget must be at least 1.");
+            throw new IllegalArgumentException("Expectimax node budget must be at least 1.");
         }
 
         this.expectimaxSearchDepth = expectimaxSearchDepth;
@@ -57,8 +56,7 @@ public class ExperimentRunner
     {
         if (numberOfGames < 1)
         {
-            throw new IllegalArgumentException(
-                    "Number of games must be at least 1.");
+            throw new IllegalArgumentException("Number of games must be at least 1.");
         }
 
         validateAiType(firstAi);
@@ -88,7 +86,8 @@ public class ExperimentRunner
         }
     }
 
-    public GameStatistics runGame(int gameId, PlayerType whitePlayerType, PlayerType blackPlayerType)
+    public GameStatistics runGame(int gameId, PlayerType whitePlayerType,
+                                  PlayerType blackPlayerType)
     {
         validateAiType(whitePlayerType);
         validateAiType(blackPlayerType);
@@ -102,7 +101,8 @@ public class ExperimentRunner
         AiPlayer whiteAi = createAiPlayer(whitePlayerType);
         AiPlayer blackAi = createAiPlayer(blackPlayerType);
 
-        while (game.getWinner() == Player.NONE)
+        while (game.getWinner() == Player.NONE
+                && gameStatistics.getTurnCount() < MAX_TURNS)
         {
             Player player = game.getCurrentPlayer();
 
@@ -162,8 +162,7 @@ public class ExperimentRunner
             case HEURISTIC_AI -> new HeuristicAi();
             case EXPECTIMAX_AI -> new ExpectimaxAi(
                     expectimaxSearchDepth, expectimaxNodeBudget);
-            case HUMAN -> throw new IllegalArgumentException(
-                    "Experiments require AI players.");
+            case HUMAN -> throw new IllegalArgumentException("Experiments require AI players.");
         };
     }
 
@@ -171,8 +170,7 @@ public class ExperimentRunner
     {
         if (playerType == PlayerType.HUMAN)
         {
-            throw new IllegalArgumentException(
-                    "Experiments require AI players.");
+            throw new IllegalArgumentException("Experiments require AI players.");
         }
     }
 }

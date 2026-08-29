@@ -34,6 +34,9 @@ public class ExperimentMain
 
         System.out.println("Games: " + analyser.getTotalGames());
 
+        System.out.println("Incomplete games: "
+                + analyser.getIncompleteGames());
+
         System.out.println(firstAi + " wins: "
                 + analyser.getWins(firstAi));
 
