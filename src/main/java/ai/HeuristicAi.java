@@ -7,17 +7,21 @@ import game.MoveGenerator;
 import game.MoveSequence;
 import game.Player;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class HeuristicAi implements AiPlayer
 {
     private final MoveGenerator moveGenerator;
     private final BoardEvaluator boardEvaluator;
+    private final Random random;
 
     public HeuristicAi()
     {
         moveGenerator = new MoveGenerator();
         boardEvaluator = new BoardEvaluator();
+        random = new Random();
     }
 
     @Override
@@ -31,7 +35,7 @@ public class HeuristicAi implements AiPlayer
             return new MoveSequence();
         }
 
-        MoveSequence bestSequence = legalSequences.getFirst();
+        List<MoveSequence> bestSequences = new ArrayList<>();
         double bestScore = Double.NEGATIVE_INFINITY;
 
         for (MoveSequence sequence : legalSequences)
@@ -48,10 +52,16 @@ public class HeuristicAi implements AiPlayer
             if (score > bestScore)
             {
                 bestScore = score;
-                bestSequence = sequence;
+                bestSequences.clear();
+                bestSequences.add(sequence);
+            }
+            else if (Double.compare(score, bestScore) == 0)
+            {
+                bestSequences.add(sequence);
             }
         }
 
-        return bestSequence;
+        return bestSequences.get(
+                random.nextInt(bestSequences.size()));
     }
 }
