@@ -56,7 +56,7 @@ public class ExperimentRunner
     {
         if (numberOfGames < 1)
         {
-            throw new IllegalArgumentException("Number of games must be at least 1.");
+            throw new IllegalArgumentException("Number of games must be at least 1");
         }
 
         validateAiType(firstAi);
@@ -83,6 +83,11 @@ public class ExperimentRunner
             GameStatistics gameStatistics = runGame(gameId, whitePlayerType, blackPlayerType);
 
             statisticsRecorder.recordGame(gameStatistics);
+
+            System.out.println("Completed game "
+                            + gameId
+                            + " / "
+                            + numberOfGames);
         }
     }
 
