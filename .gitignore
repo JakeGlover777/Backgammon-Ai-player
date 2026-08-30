@@ -16,3 +16,5 @@ lib/
 Thumbs.db
 
 experiment-output/
+analysis-output/
+experiment-output.zip
