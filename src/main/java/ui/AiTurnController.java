@@ -102,7 +102,15 @@ public class AiTurnController
         }
 
         Dice dice = game.getDice();
-        dice.roll();
+
+        if (game.isOpeningRoll())
+        {
+            game.completeOpeningRoll();
+        }
+        else
+        {
+            dice.roll();
+        }
 
         updateDiceLabel(dice);
         instructionUpdater.accept(player + " AI is moving.");
@@ -121,8 +129,7 @@ public class AiTurnController
 
         DecisionStatistics statistics = decisionResult.getStatistics();
 
-        AiTurnResult turnResult = new AiTurnResult(
-                decisionResult.getMoveSequence(), statistics);
+        AiTurnResult turnResult = new AiTurnResult(decisionResult.getMoveSequence(), statistics);
 
         turnCompleteHandler.accept(turnResult);
     }

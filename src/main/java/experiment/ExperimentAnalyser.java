@@ -93,6 +93,78 @@ public class ExperimentAnalyser
         return wins;
     }
 
+    public int getWhiteStarts()
+    {
+        int count = 0;
+
+        for (GameStatistics game : statisticsRecorder.getGames())
+        {
+            if (game.getStartingPlayer() == Player.WHITE)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    public int getBlackStarts()
+    {
+        int count = 0;
+
+        for (GameStatistics game : statisticsRecorder.getGames())
+        {
+            if (game.getStartingPlayer() == Player.BLACK)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    public int getWinsWhenStarting(Player player)
+    {
+        int wins = 0;
+
+        for (GameStatistics game : statisticsRecorder.getGames())
+        {
+            if (game.getStartingPlayer() == player
+                    && game.getWinner() == player)
+            {
+                wins++;
+            }
+        }
+
+        return wins;
+    }
+
+    public double getStartingPlayerWinRate(Player player)
+    {
+        int starts;
+
+        if (player == Player.WHITE)
+        {
+            starts = getWhiteStarts();
+        }
+        else if (player == Player.BLACK)
+        {
+            starts = getBlackStarts();
+        }
+        else
+        {
+            throw new IllegalArgumentException(
+                    "Player must be WHITE or BLACK.");
+        }
+
+        if (starts == 0)
+        {
+            return 0;
+        }
+
+        return (double) getWinsWhenStarting(player) / starts * 100;
+    }
+
     public double getAverageTurnCount()
     {
         if (getTotalGames() == 0)
@@ -213,9 +285,11 @@ public class ExperimentAnalyser
         {
             for (DecisionStatistics decision : game.getDecisions())
             {
-                SearchStatistics searchStatistics = decision.getSearchStatistics();
+                SearchStatistics searchStatistics =
+                        decision.getSearchStatistics();
 
-                if (searchStatistics != null && searchStatistics.isBudgetReached())
+                if (searchStatistics != null
+                        && searchStatistics.isBudgetReached())
                 {
                     count++;
                 }
@@ -268,5 +342,68 @@ public class ExperimentAnalyser
         }
 
         return null;
+    }
+
+    public int getWinsByStarterAndWinner(Player startingPlayer, Player winner)
+    {
+        int count = 0;
+
+        for (GameStatistics game : statisticsRecorder.getGames())
+        {
+            if (game.getStartingPlayer() == startingPlayer
+                    && game.getWinner() == winner)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    public double getWhiteWinRate()
+    {
+        int completedGames = getTotalGames() - getIncompleteGames();
+
+        if (completedGames == 0)
+        {
+            return 0;
+        }
+
+        return (double) getWhiteWins() / completedGames * 100;
+    }
+
+    public double getBlackWinRate()
+    {
+        int completedGames = getTotalGames() - getIncompleteGames();
+
+        if (completedGames == 0)
+        {
+            return 0;
+        }
+
+        return (double) getBlackWins() / completedGames * 100;
+    }
+
+    public double getOverallStarterWinRate()
+    {
+        int completedGames = getTotalGames() - getIncompleteGames();
+
+        if (completedGames == 0)
+        {
+            return 0;
+        }
+
+        int starterWins = 0;
+
+        for (GameStatistics game : statisticsRecorder.getGames())
+        {
+            if (game.getWinner() != Player.NONE
+                    && game.getStartingPlayer() == game.getWinner())
+            {
+                starterWins++;
+            }
+        }
+
+        return (double) starterWins / completedGames * 100;
     }
 }

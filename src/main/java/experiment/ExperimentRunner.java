@@ -80,19 +80,19 @@ public class ExperimentRunner
                 blackPlayerType = firstAi;
             }
 
-            GameStatistics gameStatistics = runGame(gameId, whitePlayerType, blackPlayerType);
+            GameStatistics gameStatistics =
+                    runGame(gameId, whitePlayerType, blackPlayerType);
 
             statisticsRecorder.recordGame(gameStatistics);
 
             System.out.println("Completed game "
-                            + gameId
-                            + " / "
-                            + numberOfGames);
+                    + gameId
+                    + " / "
+                    + numberOfGames);
         }
     }
 
-    public GameStatistics runGame(int gameId, PlayerType whitePlayerType,
-                                  PlayerType blackPlayerType)
+    public GameStatistics runGame(int gameId, PlayerType whitePlayerType, PlayerType blackPlayerType)
     {
         validateAiType(whitePlayerType);
         validateAiType(blackPlayerType);
@@ -101,7 +101,8 @@ public class ExperimentRunner
         Board board = game.getBoard();
         Dice dice = game.getDice();
 
-        GameStatistics gameStatistics = new GameStatistics(gameId, whitePlayerType, blackPlayerType);
+        GameStatistics gameStatistics =
+                new GameStatistics(gameId, whitePlayerType, blackPlayerType, game.getCurrentPlayer());
 
         AiPlayer whiteAi = createAiPlayer(whitePlayerType);
         AiPlayer blackAi = createAiPlayer(blackPlayerType);
@@ -117,9 +118,17 @@ public class ExperimentRunner
                     ? whiteAi
                     : blackAi;
 
-            dice.roll();
+            if (game.isOpeningRoll())
+            {
+                game.completeOpeningRoll();
+            }
+            else
+            {
+                dice.roll();
+            }
 
-            DecisionResult result = decisionRecorder.recordDecision(board, player, dice, aiPlayer, playerType);
+            DecisionResult result =
+                    decisionRecorder.recordDecision(board, player, dice, aiPlayer, playerType);
 
             MoveSequence sequence = result.getMoveSequence();
 
@@ -165,9 +174,9 @@ public class ExperimentRunner
         {
             case RANDOM_AI -> new RandomAi();
             case HEURISTIC_AI -> new HeuristicAi();
-            case EXPECTIMAX_AI -> new ExpectimaxAi(
-                    expectimaxSearchDepth, expectimaxNodeBudget);
-            case HUMAN -> throw new IllegalArgumentException("Experiments require AI players.");
+            case EXPECTIMAX_AI -> new ExpectimaxAi(expectimaxSearchDepth, expectimaxNodeBudget);
+            case HUMAN -> throw new IllegalArgumentException(
+                    "Experiments require AI players.");
         };
     }
 
@@ -175,7 +184,8 @@ public class ExperimentRunner
     {
         if (playerType == PlayerType.HUMAN)
         {
-            throw new IllegalArgumentException("Experiments require AI players.");
+            throw new IllegalArgumentException(
+                    "Experiments require AI players.");
         }
     }
 }

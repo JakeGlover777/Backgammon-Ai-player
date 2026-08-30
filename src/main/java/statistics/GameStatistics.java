@@ -12,16 +12,19 @@ public class GameStatistics
     private final int gameId;
     private final PlayerType whitePlayerType;
     private final PlayerType blackPlayerType;
+    private final Player startingPlayer;
     private final List<DecisionStatistics> decisions;
 
     private Player winner;
     private int turnCount;
 
-    public GameStatistics(int gameId, PlayerType whitePlayerType, PlayerType blackPlayerType)
+    public GameStatistics(int gameId, PlayerType whitePlayerType,
+                          PlayerType blackPlayerType, Player startingPlayer)
     {
         this.gameId = gameId;
         this.whitePlayerType = whitePlayerType;
         this.blackPlayerType = blackPlayerType;
+        this.startingPlayer = startingPlayer;
 
         decisions = new ArrayList<>();
         winner = Player.NONE;
@@ -56,6 +59,11 @@ public class GameStatistics
     public PlayerType getBlackPlayerType()
     {
         return blackPlayerType;
+    }
+
+    public Player getStartingPlayer()
+    {
+        return startingPlayer;
     }
 
     public Player getWinner()

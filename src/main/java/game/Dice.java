@@ -20,14 +20,25 @@ public class Dice
     public Dice(int dieOne, int dieTwo)
     {
         random = new Random();
-        this.dieOne = dieOne;
-        this.dieTwo = dieTwo;
+
+        setDice(dieOne, dieTwo);
     }
 
     public void roll()
     {
         dieOne = random.nextInt(NUMBER_OF_SIDES) + 1;
         dieTwo = random.nextInt(NUMBER_OF_SIDES) + 1;
+    }
+
+    public void setDice(int dieOne, int dieTwo)
+    {
+        if (!isValidDieValue(dieOne) || !isValidDieValue(dieTwo))
+        {
+            throw new IllegalArgumentException("Dice values must be between 1 and 6.");
+        }
+
+        this.dieOne = dieOne;
+        this.dieTwo = dieTwo;
     }
 
     public int getDieOne()
@@ -49,5 +60,10 @@ public class Dice
     public String toString()
     {
         return "Die 1: " + dieOne + " | Die 2: " + dieTwo;
+    }
+
+    private boolean isValidDieValue(int value)
+    {
+        return value >= 1 && value <= NUMBER_OF_SIDES;
     }
 }

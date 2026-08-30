@@ -306,8 +306,8 @@ class ExperimentAnalyserTest
                                       PlayerType blackPlayerType, Player winner,
                                       int turnCount)
     {
-        GameStatistics game = new GameStatistics(
-                gameId, whitePlayerType, blackPlayerType);
+        GameStatistics game =
+                new GameStatistics(gameId, whitePlayerType, blackPlayerType, Player.WHITE);
 
         for (int i = 0; i < turnCount; i++)
         {

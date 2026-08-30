@@ -1,4 +1,3 @@
-import experiment.ExperimentCsvExporter;
 import game.Dice;
 import game.Player;
 import game.PlayerType;
@@ -8,6 +7,7 @@ import statistics.DecisionStatistics;
 import statistics.GameStatistics;
 import statistics.SearchStatistics;
 import statistics.StatisticsRecorder;
+import experiment.ExperimentCsvExporter;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,13 +17,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ExperimentCsvExporterTest
+public class ExperimentCsvExporterTest
 {
     @TempDir
     Path tempDirectory;
 
     @Test
-    void shouldExportGameStatistics() throws IOException
+    public void exportCreatesGameAndDecisionFiles() throws IOException
     {
         StatisticsRecorder recorder = createStatistics();
 
@@ -31,23 +31,35 @@ class ExperimentCsvExporterTest
 
         exporter.export(recorder, tempDirectory);
 
-        Path gamesFile = tempDirectory.resolve("games.csv");
+        assertTrue(Files.exists(tempDirectory.resolve("games.csv")));
+        assertTrue(Files.exists(tempDirectory.resolve("decisions.csv")));
+    }
 
-        assertTrue(Files.exists(gamesFile));
+    @Test
+    public void exportWritesExpectedGameData() throws IOException
+    {
+        StatisticsRecorder recorder = createStatistics();
 
-        List<String> lines = Files.readAllLines(gamesFile);
+        ExperimentCsvExporter exporter = new ExperimentCsvExporter();
+
+        exporter.export(recorder, tempDirectory);
+
+        List<String> lines =
+                Files.readAllLines(tempDirectory.resolve("games.csv"));
+
+        assertEquals(2, lines.size());
 
         assertEquals(
-                "game_id,white_ai,black_ai,winner,turn_count",
+                "game_id,white_ai,black_ai,starting_player,winner,turn_count",
                 lines.get(0));
 
         assertEquals(
-                "1,HEURISTIC_AI,EXPECTIMAX_AI,WHITE,50",
+                "1,HEURISTIC_AI,EXPECTIMAX_AI,BLACK,WHITE,50",
                 lines.get(1));
     }
 
     @Test
-    void shouldExportDecisionStatistics() throws IOException
+    public void exportWritesExpectedDecisionData() throws IOException
     {
         StatisticsRecorder recorder = createStatistics();
 
@@ -55,11 +67,10 @@ class ExperimentCsvExporterTest
 
         exporter.export(recorder, tempDirectory);
 
-        Path decisionsFile = tempDirectory.resolve("decisions.csv");
+        List<String> lines =
+                Files.readAllLines(tempDirectory.resolve("decisions.csv"));
 
-        assertTrue(Files.exists(decisionsFile));
-
-        List<String> lines = Files.readAllLines(decisionsFile);
+        assertEquals(3, lines.size());
 
         assertEquals(
                 "game_id,player,ai_type,die_one,die_two,legal_sequences,"
@@ -68,11 +79,11 @@ class ExperimentCsvExporterTest
                 lines.get(0));
 
         assertEquals(
-                "1,WHITE,HEURISTIC_AI,3,5,10,2000000,,,,",
+                "1,WHITE,HEURISTIC_AI,3,4,5,1000,,,,",
                 lines.get(1));
 
         assertEquals(
-                "1,BLACK,EXPECTIMAX_AI,4,6,12,5000000,3000,2,10000,true",
+                "1,BLACK,EXPECTIMAX_AI,6,2,8,2000,500,2,1000,true",
                 lines.get(2));
     }
 
@@ -83,27 +94,36 @@ class ExperimentCsvExporterTest
         GameStatistics game = new GameStatistics(
                 1,
                 PlayerType.HEURISTIC_AI,
-                PlayerType.EXPECTIMAX_AI);
-
-        game.recordDecision(new DecisionStatistics(
-                Player.WHITE,
-                PlayerType.HEURISTIC_AI,
-                new Dice(3, 5),
-                10,
-                2_000_000,
-                null));
-
-        game.recordDecision(new DecisionStatistics(
-                Player.BLACK,
                 PlayerType.EXPECTIMAX_AI,
-                new Dice(4, 6),
-                12,
-                5_000_000,
+                Player.BLACK);
+
+        DecisionStatistics heuristicDecision =
+                new DecisionStatistics(
+                        Player.WHITE,
+                        PlayerType.HEURISTIC_AI,
+                        new Dice(3, 4),
+                        5,
+                        1000,
+                        null);
+
+        SearchStatistics searchStatistics =
                 new SearchStatistics(
-                        3_000,
+                        500,
                         2,
-                        10_000,
-                        true)));
+                        1000,
+                        true);
+
+        DecisionStatistics expectimaxDecision =
+                new DecisionStatistics(
+                        Player.BLACK,
+                        PlayerType.EXPECTIMAX_AI,
+                        new Dice(6, 2),
+                        8,
+                        2000,
+                        searchStatistics);
+
+        game.recordDecision(heuristicDecision);
+        game.recordDecision(expectimaxDecision);
 
         for (int i = 0; i < 50; i++)
         {

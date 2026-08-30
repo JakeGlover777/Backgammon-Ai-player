@@ -48,7 +48,8 @@ public class GameController
         moveGenerator = new MoveGenerator();
 
         statisticsRecorder = new StatisticsRecorder();
-        gameStatistics = new GameStatistics(1, whitePlayerType, blackPlayerType);
+        gameStatistics = new GameStatistics(1, whitePlayerType,
+                blackPlayerType, game.getCurrentPlayer());
 
         diceRolled = false;
         gameOver = false;
@@ -82,7 +83,15 @@ public class GameController
         }
 
         Dice dice = game.getDice();
-        dice.roll();
+
+        if (game.isOpeningRoll())
+        {
+            game.completeOpeningRoll();
+        }
+        else
+        {
+            dice.roll();
+        }
 
         updateDiceLabel(dice);
 

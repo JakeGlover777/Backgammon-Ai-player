@@ -13,7 +13,7 @@ import java.nio.file.Path;
 public class ExperimentCsvExporter
 {
     private static final String GAME_HEADER =
-            "game_id,white_ai,black_ai,winner,turn_count";
+            "game_id,white_ai,black_ai,starting_player,winner,turn_count";
 
     private static final String DECISION_HEADER =
             "game_id,player,ai_type,die_one,die_two,legal_sequences,"
@@ -25,13 +25,9 @@ public class ExperimentCsvExporter
     {
         Files.createDirectories(outputDirectory);
 
-        exportGames(
-                statisticsRecorder,
-                outputDirectory.resolve("games.csv"));
+        exportGames(statisticsRecorder, outputDirectory.resolve("games.csv"));
 
-        exportDecisions(
-                statisticsRecorder,
-                outputDirectory.resolve("decisions.csv"));
+        exportDecisions(statisticsRecorder, outputDirectory.resolve("decisions.csv"));
     }
 
     private void exportGames(StatisticsRecorder statisticsRecorder, Path outputPath)
@@ -76,6 +72,7 @@ public class ExperimentCsvExporter
         return game.getGameId()
                 + "," + game.getWhitePlayerType().name()
                 + "," + game.getBlackPlayerType().name()
+                + "," + game.getStartingPlayer()
                 + "," + game.getWinner()
                 + "," + game.getTurnCount();
     }

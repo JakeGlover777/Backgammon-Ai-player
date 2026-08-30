@@ -1,6 +1,7 @@
 package experiment;
 
 import game.PlayerType;
+import game.Player;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -11,10 +12,10 @@ public class ExperimentMain
 {
     public static void main(String[] args) throws IOException
     {
-        PlayerType firstAi = PlayerType.EXPECTIMAX_AI;
+        PlayerType firstAi = PlayerType.HEURISTIC_AI;
         PlayerType secondAi = PlayerType.HEURISTIC_AI;
 
-        int numberOfGames = 10;
+        int numberOfGames = 1000;
         int expectimaxDepth = 2;
         int expectimaxNodeBudget = 5000;
 
@@ -96,5 +97,62 @@ public class ExperimentMain
 
         System.out.println("Results saved to: "
                         + experimentName);
+
+        System.out.println("White starts: "
+                + analyser.getWhiteStarts());
+
+        System.out.println("Black starts: "
+                + analyser.getBlackStarts());
+
+        System.out.println("White wins when starting: "
+                + analyser.getWinsWhenStarting(Player.WHITE));
+
+        System.out.println("Black wins when starting: "
+                + analyser.getWinsWhenStarting(Player.BLACK));
+
+        System.out.println("White starter win rate: "
+                + analyser.getStartingPlayerWinRate(Player.WHITE)
+                + "%");
+
+        System.out.println("Black starter win rate: "
+                + analyser.getStartingPlayerWinRate(Player.BLACK)
+                + "%");
+
+        System.out.println();
+        System.out.println("Sanity statistics:");
+
+        System.out.println("White wins: "
+                + analyser.getWhiteWins());
+
+        System.out.println("Black wins: "
+                + analyser.getBlackWins());
+
+        System.out.println("White win rate: "
+                + analyser.getWhiteWinRate()
+                + "%");
+
+        System.out.println("Black win rate: "
+                + analyser.getBlackWinRate()
+                + "%");
+
+        System.out.println("WHITE start -> WHITE win: "
+                + analyser.getWinsByStarterAndWinner(
+                Player.WHITE, Player.WHITE));
+
+        System.out.println("WHITE start -> BLACK win: "
+                + analyser.getWinsByStarterAndWinner(
+                Player.WHITE, Player.BLACK));
+
+        System.out.println("BLACK start -> WHITE win: "
+                + analyser.getWinsByStarterAndWinner(
+                Player.BLACK, Player.WHITE));
+
+        System.out.println("BLACK start -> BLACK win: "
+                + analyser.getWinsByStarterAndWinner(
+                Player.BLACK, Player.BLACK));
+
+        System.out.println("Overall starting-player win rate: "
+                + analyser.getOverallStarterWinRate()
+                + "%");
     }
 }
