@@ -16,22 +16,22 @@ OUTPUT.mkdir(exist_ok=True)
 
 EXPERIMENTS = {
     "Random vs Heuristic":
-        "random_ai-vs-heuristic_ai-depth-2-budget-5000-2026-08-30_14-22-08",
+        "random_ai-vs-heuristic_ai-depth-2-budget-5000-2026-08-30_23-48-06",
 
     "Depth 1 / 10k":
-        "expectimax_ai-vs-heuristic_ai-depth-1-budget-10000-2026-08-30_14-25-23",
+        "expectimax_ai-vs-heuristic_ai-depth-1-budget-10000-2026-08-30_23-51-11",
 
     "Depth 2 / 1k":
-        "expectimax_ai-vs-heuristic_ai-depth-2-budget-1000-2026-08-30_14-29-09",
+        "expectimax_ai-vs-heuristic_ai-depth-2-budget-1000-2026-08-30_23-53-19",
 
     "Depth 2 / 5k":
-        "expectimax_ai-vs-heuristic_ai-depth-2-budget-5000-2026-08-30_14-55-26",
+        "expectimax_ai-vs-heuristic_ai-depth-2-budget-5000-2026-08-31_00-15-09",
 
     "Depth 2 / 10k":
-        "expectimax_ai-vs-heuristic_ai-depth-2-budget-10000-2026-08-30_16-04-08",
+        "expectimax_ai-vs-heuristic_ai-depth-2-budget-10000-2026-08-31_01-42-29",
 
     "Depth 1 / untruncated":
-        "expectimax_ai-vs-heuristic_ai-depth-1-budget-1000000000-2026-08-30_16-19-50",
+        "expectimax_ai-vs-heuristic_ai-depth-1-budget-1000000000-2026-08-31_02-03-00",
 }
 
 
