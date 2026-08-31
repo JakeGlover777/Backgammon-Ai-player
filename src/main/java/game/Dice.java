@@ -4,21 +4,41 @@ import java.util.Random;
 
 public class Dice
 {
+    private static final int NUMBER_OF_SIDES = 6;
+
+    private final Random random;
     private int dieOne;
     private int dieTwo;
-    private final Random random;
 
     public Dice()
     {
-        this.random = new Random();
-        this.dieOne = 0;
-        this.dieTwo = 0;
+        random = new Random();
+        dieOne = 0;
+        dieTwo = 0;
+    }
+
+    public Dice(int dieOne, int dieTwo)
+    {
+        random = new Random();
+
+        setDice(dieOne, dieTwo);
     }
 
     public void roll()
     {
-        dieOne = random.nextInt(6) + 1;
-        dieTwo = random.nextInt(6) + 1;
+        dieOne = random.nextInt(NUMBER_OF_SIDES) + 1;
+        dieTwo = random.nextInt(NUMBER_OF_SIDES) + 1;
+    }
+
+    public void setDice(int dieOne, int dieTwo)
+    {
+        if (!isValidDieValue(dieOne) || !isValidDieValue(dieTwo))
+        {
+            throw new IllegalArgumentException("Dice values must be between 1 and 6.");
+        }
+
+        this.dieOne = dieOne;
+        this.dieTwo = dieTwo;
     }
 
     public int getDieOne()
@@ -42,10 +62,8 @@ public class Dice
         return "Die 1: " + dieOne + " | Die 2: " + dieTwo;
     }
 
-    public Dice(int dieOne, int dieTwo)
+    private boolean isValidDieValue(int value)
     {
-        this.random = new Random();
-        this.dieOne = dieOne;
-        this.dieTwo = dieTwo;
+        return value >= 1 && value <= NUMBER_OF_SIDES;
     }
 }

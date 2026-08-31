@@ -14,3 +14,7 @@ lib/
 # OS files
 .DS_Store
 Thumbs.db
+
+experiment-output/
+analysis-output/
+experiment-output.zip

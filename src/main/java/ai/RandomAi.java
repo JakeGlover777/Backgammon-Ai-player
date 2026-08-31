@@ -21,30 +21,18 @@ public class RandomAi implements AiPlayer
     }
 
     @Override
-    public MoveSequence chooseMove(
-            Board board,
-            Player player,
-            Dice dice)
+    public MoveSequence chooseMove(Board board, Player player, Dice dice)
     {
         List<MoveSequence> legalSequences =
-                moveGenerator.generateMoveSequences(
-                        board,
-                        player,
-                        dice
-                );
+                moveGenerator.generateMoveSequences(board, player, dice);
 
         if (legalSequences.isEmpty())
         {
             return new MoveSequence();
         }
 
-        int randomIndex =
-                random.nextInt(
-                        legalSequences.size()
-                );
+        int randomIndex = random.nextInt(legalSequences.size());
 
-        return legalSequences.get(
-                randomIndex
-        );
+        return legalSequences.get(randomIndex);
     }
 }

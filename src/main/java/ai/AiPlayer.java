@@ -7,9 +7,5 @@ import game.Player;
 
 public interface AiPlayer
 {
-    MoveSequence chooseMove(
-            Board board,
-            Player player,
-            Dice dice
-    );
+    MoveSequence chooseMove(Board board, Player player, Dice dice);
 }
