@@ -93,8 +93,7 @@ public class MoveGenerator
 
         if (dieOne == dieTwo)
         {
-            generateDoubleSequences(sequences, board, player, dieOne,
-                    new MoveSequence(),
+            generateDoubleSequences(sequences, board, player, dieOne, new MoveSequence(),
                     MAX_DOUBLE_MOVES);
         }
         else
@@ -201,8 +200,8 @@ public class MoveGenerator
             MoveSequence copiedSequence = new MoveSequence(currentSequence);
             copiedSequence.addMove(move);
 
-            generateDoubleSequences(sequences, copiedBoard, player, dieValue,
-                    copiedSequence, movesRemaining - 1);
+            generateDoubleSequences(sequences, copiedBoard, player, dieValue, copiedSequence,
+                    movesRemaining - 1);
         }
     }
 
@@ -279,8 +278,7 @@ public class MoveGenerator
 
     private boolean isLegalDestination(Point destination, Player player)
     {
-        return destination.isEmpty()
-                || destination.getOwner() == player
+        return destination.isEmpty() || destination.getOwner() == player
                 || (destination.getOwner() != player && destination.getCheckerCount() == 1);
     }
 

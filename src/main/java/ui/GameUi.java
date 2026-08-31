@@ -86,13 +86,8 @@ public class GameUi extends Application
         Button rollButton = new Button("Roll Dice");
         Button backButton = new Button("Back");
 
-        GameController controller = new GameController(
-                game,
-                boardView,
-                whitePlayer,
-                blackPlayer,
-                currentPlayerLabel::setText,
-                diceLabel::setText,
+        GameController controller = new GameController(game, boardView, whitePlayer,
+                blackPlayer, currentPlayerLabel::setText, diceLabel::setText,
                 instructionLabel::setText);
 
         rollButton.setOnAction(event -> controller.rollDice());

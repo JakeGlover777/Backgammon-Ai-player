@@ -8,9 +8,8 @@ from scipy.stats import binomtest, linregress, norm, pearsonr
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-
-ROOT = PROJECT_ROOT / "experiment-output"
-OUTPUT = PROJECT_ROOT / "analysis-output"
+ROOT = PROJECT_ROOT / "experiment-output" / "final"
+OUTPUT = PROJECT_ROOT / "analysis-output" / "final"
 
 OUTPUT.mkdir(exist_ok=True)
 

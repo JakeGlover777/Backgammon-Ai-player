@@ -26,8 +26,8 @@ class ExpectimaxTest
 
         MoveSequence chosenSequence = ai.chooseMove(board, Player.WHITE, dice);
 
-        List<MoveSequence> legalSequences = moveGenerator.generateMoveSequences(
-                board, Player.WHITE, dice);
+        List<MoveSequence> legalSequences = moveGenerator.generateMoveSequences(board,
+                Player.WHITE, dice);
 
         assertNotNull(chosenSequence);
         assertTrue(containsEquivalentSequence(legalSequences, chosenSequence));
@@ -119,9 +119,8 @@ class ExpectimaxTest
         smallBudgetAi.chooseMove(board, Player.WHITE, dice);
         largeBudgetAi.chooseMove(board, Player.WHITE, dice);
 
-        assertTrue(
-                largeBudgetAi.getNodesEvaluated()
-                        >= smallBudgetAi.getNodesEvaluated());
+        assertTrue(largeBudgetAi.getNodesEvaluated()
+                >= smallBudgetAi.getNodesEvaluated());
     }
 
     @Test

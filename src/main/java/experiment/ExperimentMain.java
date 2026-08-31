@@ -12,19 +12,18 @@ public class ExperimentMain
 {
     public static void main(String[] args) throws IOException
     {
-        PlayerType firstAi = PlayerType.HEURISTIC_AI;
+        PlayerType firstAi = PlayerType.EXPECTIMAX_AI;
         PlayerType secondAi = PlayerType.HEURISTIC_AI;
 
-        int numberOfGames = 1000;
-        int expectimaxDepth = 2;
-        int expectimaxNodeBudget = 5000;
+        int numberOfGames = 400;
+        int expectimaxDepth = 1;
+        int expectimaxNodeBudget = 1000000000;
 
         ExperimentRunner runner = new ExperimentRunner(expectimaxDepth, expectimaxNodeBudget);
 
         runner.runMatchup(firstAi, secondAi, numberOfGames);
 
-        String timestamp = LocalDateTime.now().format(
-                DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
 
         String experimentName = firstAi.name().toLowerCase()
                         + "-vs-"
@@ -36,67 +35,69 @@ public class ExperimentMain
                         + "-"
                         + timestamp;
 
-        ExperimentCsvExporter exporter =
-                new ExperimentCsvExporter();
+        Path outputDirectory = Path.of("experiment-output", "final", experimentName);
 
-        exporter.export(runner.getStatisticsRecorder(),
-                Path.of("experiment-output", experimentName));
+        ExperimentCsvExporter exporter = new ExperimentCsvExporter();
+
+        exporter.export(runner.getStatisticsRecorder(), outputDirectory);
 
         ExperimentAnalyser analyser = new ExperimentAnalyser(runner.getStatisticsRecorder());
 
         System.out.println("Games: "
-                        + analyser.getTotalGames());
+                + analyser.getTotalGames());
 
         System.out.println("Incomplete games: "
-                        + analyser.getIncompleteGames());
+                + analyser.getIncompleteGames());
 
         System.out.println(firstAi
-                        + " wins: "
-                        + analyser.getWins(firstAi));
+                + " wins: "
+                + analyser.getWins(firstAi));
 
         System.out.println(secondAi
-                        + " wins: "
-                        + analyser.getWins(secondAi));
+                + " wins: "
+                + analyser.getWins(secondAi));
 
         System.out.println(firstAi
-                        + " win rate: "
-                        + analyser.getWinRate(firstAi)
-                        + "%");
+                + " win rate: "
+                + analyser.getWinRate(firstAi)
+                + "%");
 
         System.out.println(secondAi
-                        + " win rate: "
-                        + analyser.getWinRate(secondAi)
-                        + "%");
+                + " win rate: "
+                + analyser.getWinRate(secondAi)
+                + "%");
 
         System.out.println("Average turns: "
-                        + analyser.getAverageTurnCount());
+                + analyser.getAverageTurnCount());
 
         System.out.println("Expectimax depth: "
-                        + expectimaxDepth);
+                + expectimaxDepth);
 
         System.out.println("Expectimax node budget: "
-                        + expectimaxNodeBudget);
+                + expectimaxNodeBudget);
 
         System.out.println("Average Expectimax nodes: "
-                        + analyser.getAverageNodesEvaluated());
+                + analyser.getAverageNodesEvaluated());
 
         System.out.println("Budget reached count: "
-                        + analyser.getBudgetReachedCount());
+                + analyser.getBudgetReachedCount());
 
         System.out.println("Budget reached percentage: "
-                        + analyser.getBudgetReachedPercentage()
-                        + "%");
+                + analyser.getBudgetReachedPercentage()
+                + "%");
 
         System.out.println("Expectimax average decision time: "
-                        + analyser.getAverageDecisionTimeMilliseconds(PlayerType.EXPECTIMAX_AI)
+                        + analyser
+                        .getAverageDecisionTimeMilliseconds(PlayerType.EXPECTIMAX_AI)
                         + " ms");
 
         System.out.println("Heuristic average decision time: "
-                        + analyser.getAverageDecisionTimeMilliseconds(PlayerType.HEURISTIC_AI)
+                        + analyser
+                        .getAverageDecisionTimeMilliseconds(PlayerType.HEURISTIC_AI)
                         + " ms");
 
         System.out.println("Results saved to: "
-                        + experimentName);
+                + outputDirectory);
 
         System.out.println("White starts: "
                 + analyser.getWhiteStarts());
@@ -136,23 +137,23 @@ public class ExperimentMain
                 + "%");
 
         System.out.println("WHITE start -> WHITE win: "
-                + analyser.getWinsByStarterAndWinner(
-                Player.WHITE, Player.WHITE));
+                        + analyser
+                        .getWinsByStarterAndWinner(Player.WHITE, Player.WHITE));
 
         System.out.println("WHITE start -> BLACK win: "
-                + analyser.getWinsByStarterAndWinner(
-                Player.WHITE, Player.BLACK));
+                        + analyser
+                        .getWinsByStarterAndWinner(Player.WHITE, Player.BLACK));
 
         System.out.println("BLACK start -> WHITE win: "
-                + analyser.getWinsByStarterAndWinner(
-                Player.BLACK, Player.WHITE));
+                        + analyser
+                        .getWinsByStarterAndWinner(Player.BLACK, Player.WHITE));
 
         System.out.println("BLACK start -> BLACK win: "
-                + analyser.getWinsByStarterAndWinner(
-                Player.BLACK, Player.BLACK));
+                        + analyser
+                        .getWinsByStarterAndWinner(Player.BLACK, Player.BLACK));
 
         System.out.println("Overall starting-player win rate: "
-                + analyser.getOverallStarterWinRate()
-                + "%");
+                        + analyser.getOverallStarterWinRate()
+                        + "%");
     }
 }

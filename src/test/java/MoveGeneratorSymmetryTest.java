@@ -20,20 +20,13 @@ public class MoveGeneratorSymmetryTest
         MoveGenerator moveGenerator = new MoveGenerator();
 
         List<MoveSequence> whiteSequences =
-                moveGenerator.generateMoveSequences(
-                        board,
-                        Player.WHITE,
-                        dice);
+                moveGenerator.generateMoveSequences(board, Player.WHITE, dice);
 
         List<MoveSequence> blackSequences =
-                moveGenerator.generateMoveSequences(
-                        board,
-                        Player.BLACK,
-                        dice);
+                moveGenerator.generateMoveSequences(board, Player.BLACK, dice);
 
         assertEquals(
-                whiteSequences.size(),
-                blackSequences.size());
+                whiteSequences.size(), blackSequences.size());
     }
 
     @Test
@@ -44,20 +37,13 @@ public class MoveGeneratorSymmetryTest
         MoveGenerator moveGenerator = new MoveGenerator();
 
         List<MoveSequence> whiteSequences =
-                moveGenerator.generateMoveSequences(
-                        board,
-                        Player.WHITE,
-                        dice);
+                moveGenerator.generateMoveSequences(board, Player.WHITE, dice);
 
         List<MoveSequence> blackSequences =
-                moveGenerator.generateMoveSequences(
-                        board,
-                        Player.BLACK,
-                        dice);
+                moveGenerator.generateMoveSequences(board, Player.BLACK, dice);
 
         assertEquals(
-                whiteSequences.size(),
-                blackSequences.size());
+                whiteSequences.size(), blackSequences.size());
     }
 
     @Test
@@ -83,20 +69,13 @@ public class MoveGeneratorSymmetryTest
         MoveGenerator moveGenerator = new MoveGenerator();
 
         List<MoveSequence> whiteSequences =
-                moveGenerator.generateMoveSequences(
-                        whiteBoard,
-                        Player.WHITE,
-                        dice);
+                moveGenerator.generateMoveSequences(whiteBoard, Player.WHITE, dice);
 
         List<MoveSequence> blackSequences =
-                moveGenerator.generateMoveSequences(
-                        blackBoard,
-                        Player.BLACK,
-                        dice);
+                moveGenerator.generateMoveSequences(blackBoard, Player.BLACK, dice);
 
         assertEquals(
-                whiteSequences.size(),
-                blackSequences.size());
+                whiteSequences.size(), blackSequences.size());
     }
 
     @Test
@@ -117,19 +96,12 @@ public class MoveGeneratorSymmetryTest
         MoveGenerator moveGenerator = new MoveGenerator();
 
         List<MoveSequence> whiteSequences =
-                moveGenerator.generateMoveSequences(
-                        whiteBoard,
-                        Player.WHITE,
-                        dice);
+                moveGenerator.generateMoveSequences(whiteBoard, Player.WHITE, dice);
 
         List<MoveSequence> blackSequences =
-                moveGenerator.generateMoveSequences(
-                        blackBoard,
-                        Player.BLACK,
-                        dice);
+                moveGenerator.generateMoveSequences(blackBoard, Player.BLACK, dice);
 
         assertEquals(
-                whiteSequences.size(),
-                blackSequences.size());
+                whiteSequences.size(), blackSequences.size());
     }
 }

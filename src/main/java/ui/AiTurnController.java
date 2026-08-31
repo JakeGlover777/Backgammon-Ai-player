@@ -154,8 +154,10 @@ public class AiTurnController
 
     private void updateDiceLabel(Dice dice)
     {
-        diceUpdater.accept(
-                "Dice: " + dice.getDieOne() + " | " + dice.getDieTwo());
+        diceUpdater.accept("Dice: "
+                + dice.getDieOne()
+                + " | "
+                + dice.getDieTwo());
     }
 
     public record AiTurnResult(MoveSequence sequence, DecisionStatistics statistics)

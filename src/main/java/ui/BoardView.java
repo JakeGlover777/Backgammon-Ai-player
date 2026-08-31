@@ -122,8 +122,7 @@ public class BoardView extends Pane
                 (BOARD_HEIGHT - BEAR_OFF_HEIGHT) / 2,
                 BEAR_OFF_WIDTH, BEAR_OFF_HEIGHT);
 
-        whiteArea.setFill(
-                highlightedPoints.contains(WHITE_BEAR_OFF)
+        whiteArea.setFill(highlightedPoints.contains(WHITE_BEAR_OFF)
                         ? Color.GOLD : Color.LIGHTGRAY);
 
         whiteArea.setStroke(Color.BLACK);

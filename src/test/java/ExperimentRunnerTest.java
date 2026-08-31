@@ -15,8 +15,8 @@ class ExperimentRunnerTest
     {
         ExperimentRunner runner = new ExperimentRunner();
 
-        GameStatistics statistics = runner.runGame(
-                1, PlayerType.RANDOM_AI, PlayerType.RANDOM_AI);
+        GameStatistics statistics = runner.runGame(1, PlayerType.RANDOM_AI,
+                PlayerType.RANDOM_AI);
 
         assertTrue(statistics.getWinner() == Player.WHITE
                 || statistics.getWinner() == Player.BLACK);
@@ -29,14 +29,9 @@ class ExperimentRunnerTest
     {
         ExperimentRunner runner = new ExperimentRunner();
 
-        runner.runMatchup(
-                PlayerType.RANDOM_AI,
-                PlayerType.RANDOM_AI,
-                4);
+        runner.runMatchup(PlayerType.RANDOM_AI, PlayerType.RANDOM_AI, 4);
 
-        assertEquals(
-                4,
-                runner.getStatisticsRecorder().getGameCount());
+        assertEquals(4, runner.getStatisticsRecorder().getGameCount());
     }
 
     @Test
@@ -44,10 +39,7 @@ class ExperimentRunnerTest
     {
         ExperimentRunner runner = new ExperimentRunner();
 
-        runner.runMatchup(
-                PlayerType.RANDOM_AI,
-                PlayerType.HEURISTIC_AI,
-                4);
+        runner.runMatchup(PlayerType.RANDOM_AI, PlayerType.HEURISTIC_AI, 4);
 
         GameStatistics firstGame =
                 runner.getStatisticsRecorder().getGames().get(0);
@@ -61,37 +53,21 @@ class ExperimentRunnerTest
         GameStatistics fourthGame =
                 runner.getStatisticsRecorder().getGames().get(3);
 
-        assertEquals(
-                PlayerType.RANDOM_AI,
-                firstGame.getWhitePlayerType());
+        assertEquals(PlayerType.RANDOM_AI, firstGame.getWhitePlayerType());
 
-        assertEquals(
-                PlayerType.HEURISTIC_AI,
-                firstGame.getBlackPlayerType());
+        assertEquals(PlayerType.HEURISTIC_AI, firstGame.getBlackPlayerType());
 
-        assertEquals(
-                PlayerType.HEURISTIC_AI,
-                secondGame.getWhitePlayerType());
+        assertEquals(PlayerType.HEURISTIC_AI, secondGame.getWhitePlayerType());
 
-        assertEquals(
-                PlayerType.RANDOM_AI,
-                secondGame.getBlackPlayerType());
+        assertEquals(PlayerType.RANDOM_AI, secondGame.getBlackPlayerType());
 
-        assertEquals(
-                PlayerType.RANDOM_AI,
-                thirdGame.getWhitePlayerType());
+        assertEquals(PlayerType.RANDOM_AI, thirdGame.getWhitePlayerType());
 
-        assertEquals(
-                PlayerType.HEURISTIC_AI,
-                thirdGame.getBlackPlayerType());
+        assertEquals(PlayerType.HEURISTIC_AI, thirdGame.getBlackPlayerType());
 
-        assertEquals(
-                PlayerType.HEURISTIC_AI,
-                fourthGame.getWhitePlayerType());
+        assertEquals(PlayerType.HEURISTIC_AI, fourthGame.getWhitePlayerType());
 
-        assertEquals(
-                PlayerType.RANDOM_AI,
-                fourthGame.getBlackPlayerType());
+        assertEquals(PlayerType.RANDOM_AI, fourthGame.getBlackPlayerType());
     }
 
     @Test
@@ -101,10 +77,7 @@ class ExperimentRunnerTest
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> runner.runGame(
-                        1,
-                        PlayerType.HUMAN,
-                        PlayerType.RANDOM_AI));
+                () -> runner.runGame(1, PlayerType.HUMAN, PlayerType.RANDOM_AI));
     }
 
     @Test
@@ -114,10 +87,7 @@ class ExperimentRunnerTest
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> runner.runMatchup(
-                        PlayerType.RANDOM_AI,
-                        PlayerType.HUMAN,
-                        10));
+                () -> runner.runMatchup(PlayerType.RANDOM_AI, PlayerType.HUMAN, 10));
     }
 
     @Test
@@ -127,10 +97,7 @@ class ExperimentRunnerTest
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> runner.runMatchup(
-                        PlayerType.RANDOM_AI,
-                        PlayerType.HEURISTIC_AI,
-                        0));
+                () -> runner.runMatchup(PlayerType.RANDOM_AI, PlayerType.HEURISTIC_AI, 0));
     }
 
     @Test

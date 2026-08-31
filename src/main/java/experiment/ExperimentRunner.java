@@ -80,8 +80,7 @@ public class ExperimentRunner
                 blackPlayerType = firstAi;
             }
 
-            GameStatistics gameStatistics =
-                    runGame(gameId, whitePlayerType, blackPlayerType);
+            GameStatistics gameStatistics = runGame(gameId, whitePlayerType, blackPlayerType);
 
             statisticsRecorder.recordGame(gameStatistics);
 
@@ -107,16 +106,13 @@ public class ExperimentRunner
         AiPlayer whiteAi = createAiPlayer(whitePlayerType);
         AiPlayer blackAi = createAiPlayer(blackPlayerType);
 
-        while (game.getWinner() == Player.NONE
-                && gameStatistics.getTurnCount() < MAX_TURNS)
+        while (game.getWinner() == Player.NONE && gameStatistics.getTurnCount() < MAX_TURNS)
         {
             Player player = game.getCurrentPlayer();
 
             PlayerType playerType = getPlayerType(player, whitePlayerType, blackPlayerType);
 
-            AiPlayer aiPlayer = player == Player.WHITE
-                    ? whiteAi
-                    : blackAi;
+            AiPlayer aiPlayer = player == Player.WHITE ? whiteAi : blackAi;
 
             if (game.isOpeningRoll())
             {
@@ -163,9 +159,7 @@ public class ExperimentRunner
     private PlayerType getPlayerType(Player player, PlayerType whitePlayerType,
                                      PlayerType blackPlayerType)
     {
-        return player == Player.WHITE
-                ? whitePlayerType
-                : blackPlayerType;
+        return player == Player.WHITE ? whitePlayerType : blackPlayerType;
     }
 
     private AiPlayer createAiPlayer(PlayerType playerType)
@@ -175,8 +169,7 @@ public class ExperimentRunner
             case RANDOM_AI -> new RandomAi();
             case HEURISTIC_AI -> new HeuristicAi();
             case EXPECTIMAX_AI -> new ExpectimaxAi(expectimaxSearchDepth, expectimaxNodeBudget);
-            case HUMAN -> throw new IllegalArgumentException(
-                    "Experiments require AI players.");
+            case HUMAN -> throw new IllegalArgumentException("Experiments require AI players.");
         };
     }
 
@@ -184,8 +177,7 @@ public class ExperimentRunner
     {
         if (playerType == PlayerType.HUMAN)
         {
-            throw new IllegalArgumentException(
-                    "Experiments require AI players.");
+            throw new IllegalArgumentException("Experiments require AI players.");
         }
     }
 }

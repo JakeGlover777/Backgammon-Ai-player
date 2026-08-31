@@ -79,8 +79,8 @@ public class ExpectimaxAi implements AiPlayer
 
             Player opponent = getOpponent(player);
 
-            double score = calculateExpectedScore(
-                    simulatedBoard, opponent, player, searchDepth, nodeBudget);
+            double score = calculateExpectedScore(simulatedBoard, opponent, player,
+                    searchDepth, nodeBudget);
 
             if (score > bestScore)
             {
@@ -141,8 +141,7 @@ public class ExpectimaxAi implements AiPlayer
             {
                 Dice dice = new Dice(dieOne, dieTwo);
 
-                totalScore += calculateDecisionScore(
-                        board, currentPlayer, originalPlayer, dice,
+                totalScore += calculateDecisionScore(board, currentPlayer, originalPlayer, dice,
                         depthRemaining, budgetPerOutcome);
             }
         }
@@ -174,14 +173,12 @@ public class ExpectimaxAi implements AiPlayer
 
         if (currentPlayer == originalPlayer)
         {
-            return findMaximumScore(
-                    board, currentPlayer, originalPlayer,
-                    legalSequences, depthRemaining, remainingBudget);
+            return findMaximumScore(board, currentPlayer, originalPlayer, legalSequences,
+                    depthRemaining, remainingBudget);
         }
 
-        return findMinimumScore(
-                board, currentPlayer, originalPlayer,
-                legalSequences, depthRemaining, remainingBudget);
+        return findMinimumScore(board, currentPlayer, originalPlayer, legalSequences,
+                depthRemaining, remainingBudget);
     }
 
     private double findMaximumScore(Board board, Player currentPlayer, Player originalPlayer,
@@ -209,8 +206,7 @@ public class ExpectimaxAi implements AiPlayer
             Board futureBoard = new Board(board);
             applySequence(futureBoard, sequence);
 
-            double score = calculateExpectedScore(
-                    futureBoard, getOpponent(currentPlayer), originalPlayer,
+            double score = calculateExpectedScore(futureBoard, getOpponent(currentPlayer), originalPlayer,
                     depthRemaining - 1, budgetPerSequence);
 
             if (score > bestScore)

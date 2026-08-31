@@ -23,12 +23,8 @@ class DecisionRecorderTest
 
         DecisionRecorder recorder = new DecisionRecorder();
 
-        DecisionResult result = recorder.recordDecision(
-                board,
-                Player.WHITE,
-                dice,
-                new HeuristicAi(),
-                PlayerType.HEURISTIC_AI);
+        DecisionResult result = recorder.recordDecision(board, Player.WHITE, dice,
+                new HeuristicAi(), PlayerType.HEURISTIC_AI);
 
         assertNotNull(result);
         assertNotNull(result.getMoveSequence());
@@ -42,12 +38,8 @@ class DecisionRecorderTest
 
         DecisionRecorder recorder = new DecisionRecorder();
 
-        DecisionResult result = recorder.recordDecision(
-                board,
-                Player.WHITE,
-                dice,
-                new RandomAi(),
-                PlayerType.RANDOM_AI);
+        DecisionResult result = recorder.recordDecision(board, Player.WHITE, dice,
+                new RandomAi(), PlayerType.RANDOM_AI);
 
         assertNotNull(result.getStatistics());
         assertEquals(Player.WHITE, result.getStatistics().getPlayer());
@@ -66,12 +58,8 @@ class DecisionRecorderTest
 
         DecisionRecorder recorder = new DecisionRecorder();
 
-        DecisionResult result = recorder.recordDecision(
-                board,
-                Player.WHITE,
-                dice,
-                new HeuristicAi(),
-                PlayerType.HEURISTIC_AI);
+        DecisionResult result = recorder.recordDecision(board, Player.WHITE, dice,
+                new HeuristicAi(), PlayerType.HEURISTIC_AI);
 
         assertNull(result.getStatistics().getSearchStatistics());
     }

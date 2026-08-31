@@ -27,11 +27,7 @@ public class MoveGeneratorTest
         MoveGenerator generator = new MoveGenerator();
 
         List<MoveSequence> sequences =
-                generator.generateMoveSequences(
-                        board,
-                        Player.WHITE,
-                        dice
-                );
+                generator.generateMoveSequences(board, Player.WHITE, dice);
 
         boolean foundFourMoveSequence = false;
 
@@ -57,11 +53,7 @@ public class MoveGeneratorTest
         MoveGenerator generator = new MoveGenerator();
 
         List<MoveSequence> sequences =
-                generator.generateMoveSequences(
-                        board,
-                        Player.WHITE,
-                        dice
-                );
+                generator.generateMoveSequences(board, Player.WHITE, dice);
 
         assertFalse(sequences.isEmpty());
 
@@ -86,21 +78,14 @@ public class MoveGeneratorTest
         MoveGenerator generator = new MoveGenerator();
 
         List<MoveSequence> sequences =
-                generator.generateMoveSequences(
-                        board,
-                        Player.WHITE,
-                        dice
-                );
+                generator.generateMoveSequences(board, Player.WHITE, dice);
 
         assertFalse(sequences.isEmpty());
 
         for (MoveSequence sequence : sequences)
         {
             assertEquals(1, sequence.size());
-            assertEquals(
-                    5,
-                    sequence.getMoves().getFirst().getDieValue()
-            );
+            assertEquals(5, sequence.getMoves().getFirst().getDieValue());
         }
     }
 
@@ -122,11 +107,7 @@ public class MoveGeneratorTest
         MoveGenerator generator = new MoveGenerator();
 
         List<MoveSequence> sequences =
-                generator.generateMoveSequences(
-                        board,
-                        Player.WHITE,
-                        dice
-                );
+                generator.generateMoveSequences(board, Player.WHITE, dice);
 
         assertTrue(sequences.isEmpty());
     }
@@ -138,12 +119,7 @@ public class MoveGeneratorTest
 
         board.getPoint(0).addChecker(Player.BLACK);
 
-        Move hitMove = new Move(
-                Player.BLACK,
-                0,
-                1,
-                1
-        );
+        Move hitMove = new Move(Player.BLACK, 0, 1, 1);
 
         board.getPoint(1).addChecker(Player.WHITE);
         board.applyMove(hitMove);
@@ -155,21 +131,14 @@ public class MoveGeneratorTest
         MoveGenerator generator = new MoveGenerator();
 
         List<MoveSequence> sequences =
-                generator.generateMoveSequences(
-                        board,
-                        Player.WHITE,
-                        dice
-                );
+                generator.generateMoveSequences(board, Player.WHITE, dice);
 
         assertFalse(sequences.isEmpty());
 
         for (MoveSequence sequence : sequences)
         {
             assertTrue(
-                    sequence.getMoves()
-                            .getFirst()
-                            .isEnteringFromBar()
-            );
+                    sequence.getMoves().getFirst().isEnteringFromBar());
         }
     }
 
@@ -181,12 +150,7 @@ public class MoveGeneratorTest
         board.getPoint(1).addChecker(Player.WHITE);
         board.getPoint(0).addChecker(Player.BLACK);
 
-        Move hitMove = new Move(
-                Player.BLACK,
-                0,
-                1,
-                1
-        );
+        Move hitMove = new Move(Player.BLACK, 0, 1, 1);
 
         board.applyMove(hitMove);
 
@@ -197,11 +161,7 @@ public class MoveGeneratorTest
         MoveGenerator generator = new MoveGenerator();
 
         List<MoveSequence> sequences =
-                generator.generateMoveSequences(
-                        board,
-                        Player.WHITE,
-                        dice
-                );
+                generator.generateMoveSequences(board, Player.WHITE, dice);
 
         assertFalse(sequences.isEmpty());
 
@@ -212,10 +172,7 @@ public class MoveGeneratorTest
             if (sequence.size() == 2)
             {
                 assertTrue(
-                        sequence.getMoves()
-                                .getFirst()
-                                .isEnteringFromBar()
-                );
+                        sequence.getMoves().getFirst().isEnteringFromBar());
 
                 foundTwoMoveSequence = true;
             }
@@ -237,11 +194,7 @@ public class MoveGeneratorTest
         MoveGenerator generator = new MoveGenerator();
 
         List<MoveSequence> sequences =
-                generator.generateMoveSequences(
-                        board,
-                        Player.WHITE,
-                        dice
-                );
+                generator.generateMoveSequences(board, Player.WHITE, dice);
 
         assertFalse(sequences.isEmpty());
 

@@ -7,8 +7,11 @@ import statistics.GameStatistics;
 import statistics.SearchStatistics;
 import statistics.StatisticsRecorder;
 
+
 public class ExperimentAnalyser
 {
+    private static final int PERCENTAGE = 100;
+
     private final StatisticsRecorder statisticsRecorder;
 
     public ExperimentAnalyser(StatisticsRecorder statisticsRecorder)
@@ -60,7 +63,7 @@ public class ExperimentAnalyser
             return 0;
         }
 
-        return (double) getWins(aiType) / completedGames * 100;
+        return (double) getWins(aiType) / completedGames * PERCENTAGE;
     }
 
     public int getWhiteWins()
@@ -129,8 +132,7 @@ public class ExperimentAnalyser
 
         for (GameStatistics game : statisticsRecorder.getGames())
         {
-            if (game.getStartingPlayer() == player
-                    && game.getWinner() == player)
+            if (game.getStartingPlayer() == player && game.getWinner() == player)
             {
                 wins++;
             }
@@ -153,8 +155,7 @@ public class ExperimentAnalyser
         }
         else
         {
-            throw new IllegalArgumentException(
-                    "Player must be WHITE or BLACK.");
+            throw new IllegalArgumentException("Player must be WHITE or BLACK.");
         }
 
         if (starts == 0)
@@ -162,7 +163,7 @@ public class ExperimentAnalyser
             return 0;
         }
 
-        return (double) getWinsWhenStarting(player) / starts * 100;
+        return (double) getWinsWhenStarting(player) / starts * PERCENTAGE;
     }
 
     public double getAverageTurnCount()
@@ -308,7 +309,7 @@ public class ExperimentAnalyser
             return 0;
         }
 
-        return (double) getBudgetReachedCount() / searchCount * 100;
+        return (double) getBudgetReachedCount() / searchCount * PERCENTAGE;
     }
 
     private int getExpectimaxDecisionCount()
@@ -350,8 +351,7 @@ public class ExperimentAnalyser
 
         for (GameStatistics game : statisticsRecorder.getGames())
         {
-            if (game.getStartingPlayer() == startingPlayer
-                    && game.getWinner() == winner)
+            if (game.getStartingPlayer() == startingPlayer && game.getWinner() == winner)
             {
                 count++;
             }
@@ -369,7 +369,7 @@ public class ExperimentAnalyser
             return 0;
         }
 
-        return (double) getWhiteWins() / completedGames * 100;
+        return (double) getWhiteWins() / completedGames * PERCENTAGE;
     }
 
     public double getBlackWinRate()
@@ -381,7 +381,7 @@ public class ExperimentAnalyser
             return 0;
         }
 
-        return (double) getBlackWins() / completedGames * 100;
+        return (double) getBlackWins() / completedGames * PERCENTAGE;
     }
 
     public double getOverallStarterWinRate()
@@ -397,13 +397,12 @@ public class ExperimentAnalyser
 
         for (GameStatistics game : statisticsRecorder.getGames())
         {
-            if (game.getWinner() != Player.NONE
-                    && game.getStartingPlayer() == game.getWinner())
+            if (game.getWinner() != Player.NONE && game.getStartingPlayer() == game.getWinner())
             {
                 starterWins++;
             }
         }
 
-        return (double) starterWins / completedGames * 100;
+        return (double) starterWins / completedGames * PERCENTAGE;
     }
 }

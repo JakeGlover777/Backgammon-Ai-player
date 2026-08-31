@@ -49,13 +49,10 @@ public class ExperimentCsvExporterTest
 
         assertEquals(2, lines.size());
 
-        assertEquals(
-                "game_id,white_ai,black_ai,starting_player,winner,turn_count",
+        assertEquals("game_id,white_ai,black_ai,starting_player,winner,turn_count",
                 lines.get(0));
 
-        assertEquals(
-                "1,HEURISTIC_AI,EXPECTIMAX_AI,BLACK,WHITE,50",
-                lines.get(1));
+        assertEquals("1,HEURISTIC_AI,EXPECTIMAX_AI,BLACK,WHITE,50", lines.get(1));
     }
 
     @Test
@@ -72,18 +69,15 @@ public class ExperimentCsvExporterTest
 
         assertEquals(3, lines.size());
 
-        assertEquals(
-                "game_id,player,ai_type,die_one,die_two,legal_sequences,"
+        assertEquals("game_id,player,ai_type,die_one,die_two,legal_sequences,"
                         + "decision_time_ns,nodes_evaluated,search_depth,"
                         + "node_budget,budget_reached",
                 lines.get(0));
 
-        assertEquals(
-                "1,WHITE,HEURISTIC_AI,3,4,5,1000,,,,",
+        assertEquals("1,WHITE,HEURISTIC_AI,3,4,5,1000,,,,",
                 lines.get(1));
 
-        assertEquals(
-                "1,BLACK,EXPECTIMAX_AI,6,2,8,2000,500,2,1000,true",
+        assertEquals("1,BLACK,EXPECTIMAX_AI,6,2,8,2000,500,2,1000,true",
                 lines.get(2));
     }
 
@@ -91,34 +85,21 @@ public class ExperimentCsvExporterTest
     {
         StatisticsRecorder recorder = new StatisticsRecorder();
 
-        GameStatistics game = new GameStatistics(
-                1,
-                PlayerType.HEURISTIC_AI,
-                PlayerType.EXPECTIMAX_AI,
-                Player.BLACK);
+        GameStatistics game = new GameStatistics(1, PlayerType.HEURISTIC_AI,
+                PlayerType.EXPECTIMAX_AI, Player.BLACK);
 
         DecisionStatistics heuristicDecision =
-                new DecisionStatistics(
-                        Player.WHITE,
-                        PlayerType.HEURISTIC_AI,
-                        new Dice(3, 4),
-                        5,
-                        1000,
-                        null);
+                new DecisionStatistics(Player.WHITE, PlayerType.HEURISTIC_AI,
+                        new Dice(3, 4), 5,
+                        1000, null);
 
         SearchStatistics searchStatistics =
-                new SearchStatistics(
-                        500,
-                        2,
-                        1000,
+                new SearchStatistics(500, 2, 1000,
                         true);
 
         DecisionStatistics expectimaxDecision =
-                new DecisionStatistics(
-                        Player.BLACK,
-                        PlayerType.EXPECTIMAX_AI,
-                        new Dice(6, 2),
-                        8,
+                new DecisionStatistics(Player.BLACK, PlayerType.EXPECTIMAX_AI,
+                        new Dice(6, 2), 8,
                         2000,
                         searchStatistics);
 

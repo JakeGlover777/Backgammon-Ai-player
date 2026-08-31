@@ -58,8 +58,7 @@ public class ExperimentCsvExporter
             {
                 for (DecisionStatistics decision : game.getDecisions())
                 {
-                    writer.write(createDecisionRow(
-                            game.getGameId(), decision));
+                    writer.write(createDecisionRow(game.getGameId(), decision));
 
                     writer.newLine();
                 }

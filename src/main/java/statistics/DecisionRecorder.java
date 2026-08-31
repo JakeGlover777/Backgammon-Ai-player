@@ -32,8 +32,8 @@ public class DecisionRecorder
         SearchStatistics searchStatistics = createSearchStatistics(aiPlayer);
         Dice recordedDice = new Dice(dice.getDieOne(), dice.getDieTwo());
 
-        DecisionStatistics statistics = new DecisionStatistics(player, playerType, recordedDice, legalSequenceCount,
-                decisionTimeNanoseconds, searchStatistics);
+        DecisionStatistics statistics = new DecisionStatistics(player, playerType, recordedDice,
+                legalSequenceCount, decisionTimeNanoseconds, searchStatistics);
 
         return new DecisionResult(sequence, statistics);
     }

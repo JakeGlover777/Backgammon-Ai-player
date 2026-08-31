@@ -18,8 +18,8 @@ public class GameStatistics
     private Player winner;
     private int turnCount;
 
-    public GameStatistics(int gameId, PlayerType whitePlayerType,
-                          PlayerType blackPlayerType, Player startingPlayer)
+    public GameStatistics(int gameId, PlayerType whitePlayerType, PlayerType blackPlayerType,
+                          Player startingPlayer)
     {
         this.gameId = gameId;
         this.whitePlayerType = whitePlayerType;

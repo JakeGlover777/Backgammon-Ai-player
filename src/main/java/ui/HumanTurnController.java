@@ -45,8 +45,7 @@ public class HumanTurnController
 
         if (currentMoveRequiresBarEntry())
         {
-            instructionUpdater.accept(
-                    "You have a checker on the bar. Select it to re-enter.");
+            instructionUpdater.accept("You have a checker on the bar. Select it to re-enter.");
         }
         else
         {
@@ -79,8 +78,7 @@ public class HumanTurnController
         {
             if (pointIndex != correctBar)
             {
-                instructionUpdater.accept(
-                        "You must enter your checker from the bar first.");
+                instructionUpdater.accept("You must enter your checker from the bar first.");
                 return;
             }
 

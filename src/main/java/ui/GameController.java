@@ -55,11 +55,11 @@ public class GameController
         gameOver = false;
         active = true;
 
-        humanTurnController = new HumanTurnController(
-                board, boardView, instructionUpdater, this::applySelectedMove);
+        humanTurnController = new HumanTurnController(board, boardView,
+                instructionUpdater, this::applySelectedMove);
 
-        aiTurnController = new AiTurnController(
-                game, whitePlayerType, blackPlayerType, diceUpdater, instructionUpdater);
+        aiTurnController = new AiTurnController(game, whitePlayerType, blackPlayerType,
+                diceUpdater, instructionUpdater);
 
         boardView.setOnPointClicked(this::handleBoardClick);
     }
@@ -95,8 +95,8 @@ public class GameController
 
         updateDiceLabel(dice);
 
-        List<MoveSequence> legalSequences = moveGenerator.generateMoveSequences(
-                board, game.getCurrentPlayer(), dice);
+        List<MoveSequence> legalSequences = moveGenerator.generateMoveSequences(board,
+                game.getCurrentPlayer(), dice);
 
         if (legalSequences.isEmpty())
         {
@@ -252,14 +252,16 @@ public class GameController
 
     private void updateCurrentPlayerLabel()
     {
-        currentPlayerUpdater.accept(
-                "Current Player: " + game.getCurrentPlayer());
+        currentPlayerUpdater.accept("Current Player: "
+                + game.getCurrentPlayer());
     }
 
     private void updateDiceLabel(Dice dice)
     {
-        diceUpdater.accept(
-                "Dice: " + dice.getDieOne() + " | " + dice.getDieTwo());
+        diceUpdater.accept("Dice: "
+                + dice.getDieOne()
+                + " | "
+                + dice.getDieTwo());
     }
 
     private void resetDiceLabel()
