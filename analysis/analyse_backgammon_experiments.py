@@ -114,16 +114,9 @@ def analyse_experiment(name, folder_name):
     game_count = len(completed_games)
     win_rate = wins / game_count
 
-    confidence_low, confidence_high = wilson_interval(
-        wins,
-        game_count
-    )
+    confidence_low, confidence_high = wilson_interval(wins,game_count)
 
-    p_value = binomtest(
-        wins,
-        game_count,
-        0.5
-    ).pvalue
+    p_value = binomtest(wins,game_count,0.5).pvalue
 
     target_decisions = [
         decision
@@ -198,46 +191,32 @@ def analyse_experiment(name, folder_name):
 
         "average_turns": statistics.mean(
             int(game["turn_count"])
-            for game in games
-        ),
+            for game in games),
 
-        "mean_time_ms": statistics.mean(
-            decision_times
-        ),
+        "mean_time_ms": statistics.mean(decision_times),
 
-        "median_time_ms": statistics.median(
-            decision_times
-        ),
+        "median_time_ms": statistics.median(decision_times),
 
-        "sd_time_ms": statistics.stdev(
-            decision_times
-        ),
+        "sd_time_ms": statistics.stdev(decision_times),
 
-        "p95_time_ms": percentile(
-            decision_times,
-            0.95
-        ),
+        "p95_time_ms": percentile(decision_times, 0.95),
 
-        "mean_nodes": (
-            statistics.mean(node_counts)
+        "mean_nodes": (statistics.mean(node_counts)
             if node_counts
             else None
         ),
 
-        "median_nodes": (
-            statistics.median(node_counts)
+        "median_nodes": (statistics.median(node_counts)
             if node_counts
             else None
         ),
 
-        "sd_nodes": (
-            statistics.stdev(node_counts)
+        "sd_nodes": (statistics.stdev(node_counts)
             if len(node_counts) > 1
             else None
         ),
 
-        "p95_nodes": (
-            percentile(node_counts, 0.95)
+        "p95_nodes": (percentile(node_counts, 0.95)
             if node_counts
             else None
         ),
@@ -256,11 +235,7 @@ def analyse_experiment(name, folder_name):
 
 
 def compare_proportions(first, second):
-    pooled_rate = (
-        first["wins"] + second["wins"]
-    ) / (
-        first["games"] + second["games"]
-    )
+    pooled_rate = (first["wins"] + second["wins"]) / (first["games"] + second["games"])
 
     standard_error = math.sqrt(
         pooled_rate
