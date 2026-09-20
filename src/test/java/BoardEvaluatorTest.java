@@ -27,10 +27,8 @@ public class BoardEvaluatorTest
         Board board = new Board();
         BoardEvaluator evaluator = new BoardEvaluator();
 
-        assertEquals(0.0, evaluator.evaluate(board, Player.WHITE),
-                TOLERANCE);
+        assertEquals(0.0, evaluator.evaluate(board, Player.WHITE), TOLERANCE);
 
-        assertEquals(0.0, evaluator.evaluate(board, Player.BLACK),
-                TOLERANCE);
+        assertEquals(0.0, evaluator.evaluate(board, Player.BLACK), TOLERANCE);
     }
 }

@@ -4,12 +4,35 @@ import game.Board;
 import game.Player;
 import game.Point;
 
+/**
+ * Evaluates a Backgammon board state from the perspective of a specified
+ * player.
+ *
+ * <p>The evaluation considers borne-off checkers, checkers on the bar,
+ * exposed blots, and checker progress. The player's score is evaluated
+ * relative to the opponent.
+ */
+
+
 public class BoardEvaluator
 {
     private static final int BOARD_SIZE = 24;
     private static final int BORNE_OFF_WEIGHT = 100;
     private static final int BAR_WEIGHT = 40;
     private static final int BLOT_WEIGHT = 8;
+
+    /**
+     * Calculates a heuristic score for the current board state from the
+     * perspective of the specified player.
+     *
+     * <p>Higher scores represent board states that are more favourable to the
+     * specified player.
+     *
+     * @param board the board state to evaluate
+     * @param player the player whose perspective is used for the evaluation
+     * @return the heuristic score of the board state
+     */
+
 
     public double evaluate(Board board, Player player)
     {
@@ -32,6 +55,18 @@ public class BoardEvaluator
         return score;
     }
 
+    /**
+     * Counts the number of exposed blots belonging to the specified player.
+     *
+     * <p>A blot is a point containing exactly one checker belonging to the
+     * player.
+     *
+     * @param board the board state to examine
+     * @param player the player whose blots are counted
+     * @return the number of blots belonging to the player
+     */
+
+
     private int countBlots(Board board, Player player)
     {
         int blots = 0;
@@ -48,6 +83,19 @@ public class BoardEvaluator
 
         return blots;
     }
+
+    /**
+     * Calculates the positional progress of the specified player's checkers
+     * across the board.
+     *
+     * <p>Checkers positioned further in the player's direction of travel
+     * contribute a higher value.
+     *
+     * @param board the board state to examine
+     * @param player the player whose progress is calculated
+     * @return the total positional progress value
+     */
+
 
     private int calculateProgress(Board board, Player player)
     {

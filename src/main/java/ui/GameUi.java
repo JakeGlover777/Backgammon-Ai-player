@@ -15,6 +15,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+/**
+ * Provides the JavaFX user interface for the Backgammon application.
+ *
+ * <p>The interface allows the player types to be configured before creating
+ * the game screen, board view, and game controller.
+ */
+
 public class GameUi extends Application
 {
     private static final double SETUP_SPACING = 15;
@@ -27,11 +34,23 @@ public class GameUi extends Application
     private static final double GAME_WIDTH = 900;
     private static final double GAME_HEIGHT = 720;
 
+    /**
+     * Starts the JavaFX application and displays the game setup screen.
+     *
+     * @param stage the primary application stage
+     */
+
     @Override
     public void start(Stage stage)
     {
         showSetupScreen(stage);
     }
+
+    /**
+     * Displays the setup screen used to select the White and Black player types.
+     *
+     * @param stage the application stage on which the setup screen is displayed
+     */
 
     private void showSetupScreen(Stage stage)
     {
@@ -68,6 +87,17 @@ public class GameUi extends Application
 
         return playerBox;
     }
+
+    /**
+     * Displays a new Backgammon game using the selected player types.
+     *
+     * <p>The game state, board view, interface controls, and game controller are
+     * created before the controller is started.
+     *
+     * @param stage the application stage on which the game is displayed
+     * @param whitePlayer the controller type assigned to White
+     * @param blackPlayer the controller type assigned to Black
+     */
 
     private void showGameScreen(Stage stage, PlayerType whitePlayer, PlayerType blackPlayer)
     {

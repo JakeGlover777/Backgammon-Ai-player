@@ -19,6 +19,14 @@ import statistics.DecisionStatistics;
 
 import java.util.function.Consumer;
 
+/**
+ * Manages turns for AI-controlled players in the user interface.
+ *
+ * <p>The controller schedules AI turns, handles dice rolls, creates the
+ * appropriate AI implementation, records decision statistics, and returns
+ * completed AI decisions to the game controller.
+ */
+
 public class AiTurnController
 {
     private static final double AI_DELAY_MILLISECONDS = 500;
@@ -38,6 +46,17 @@ public class AiTurnController
     private PauseTransition aiPause;
     private boolean active;
 
+    /**
+     * Creates an AI turn controller for the supplied game and player
+     * configuration.
+     *
+     * @param game the game being controlled
+     * @param whitePlayerType the controller type assigned to White
+     * @param blackPlayerType the controller type assigned to Black
+     * @param diceUpdater updates the displayed dice values
+     * @param instructionUpdater updates the displayed player instructions
+     */
+
     public AiTurnController(Game game, PlayerType whitePlayerType, PlayerType blackPlayerType,
                             Consumer<String> diceUpdater, Consumer<String> instructionUpdater)
     {
@@ -54,10 +73,27 @@ public class AiTurnController
         active = true;
     }
 
+    /**
+     * Determines whether the current player is controlled by an AI.
+     *
+     * @return true if the current player is AI-controlled, otherwise false
+     */
+
     public boolean isAiTurn()
     {
         return getPlayerType(game.getCurrentPlayer()) != PlayerType.HUMAN;
     }
+
+    /**
+     * Schedules a turn for the current AI-controlled player.
+     *
+     * <p>The turn begins after a short interface delay. When processing is
+     * complete, the appropriate handler is invoked depending on whether a legal
+     * move was available.
+     *
+     * @param turnCompleteHandler handles a completed AI turn
+     * @param noLegalMovesHandler handles a turn in which no legal moves are available
+     */
 
     public void scheduleTurn(Consumer<AiTurnResult> turnCompleteHandler,
                              Runnable noLegalMovesHandler)
@@ -75,6 +111,10 @@ public class AiTurnController
         aiPause.play();
     }
 
+    /**
+     * Stops the AI turn controller and cancels any currently scheduled turn.
+     */
+
     public void stop()
     {
         active = false;
@@ -84,6 +124,16 @@ public class AiTurnController
             aiPause.stop();
         }
     }
+
+    /**
+     * Processes a turn for the current AI-controlled player.
+     *
+     * <p>The method prepares the dice, checks for available legal moves, records
+     * the AI decision, and passes the completed result to the supplied handler.
+     *
+     * @param turnCompleteHandler handles a completed AI turn
+     * @param noLegalMovesHandler handles a turn in which no legal moves are available
+     */
 
     private void playTurn(Consumer<AiTurnResult> turnCompleteHandler,
                           Runnable noLegalMovesHandler)
@@ -134,6 +184,13 @@ public class AiTurnController
         turnCompleteHandler.accept(turnResult);
     }
 
+    /**
+     * Creates the AI implementation assigned to the current player.
+     *
+     * @return the AI player for the current player, or null if the current player
+     *         is human-controlled
+     */
+
     private AiPlayer getAiPlayer()
     {
         PlayerType playerType = getPlayerType(game.getCurrentPlayer());
@@ -159,6 +216,13 @@ public class AiTurnController
                 + " | "
                 + dice.getDieTwo());
     }
+
+    /**
+     * Contains the move sequence and statistics produced by a completed AI turn.
+     *
+     * @param sequence the move sequence selected by the AI
+     * @param statistics the statistics recorded for the AI decision
+     */
 
     public record AiTurnResult(MoveSequence sequence, DecisionStatistics statistics)
     {

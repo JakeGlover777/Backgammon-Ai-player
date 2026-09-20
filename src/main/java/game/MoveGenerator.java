@@ -3,12 +3,33 @@ package game;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Generates legal moves and move sequences for a Backgammon position.
+ *
+ * <p>The generator accounts for bar entry, bearing off, doubles, both possible
+ * dice orders, the requirement to use the maximum possible number of dice, and
+ * the higher-die rule when only one of two different dice can be played.
+ */
+
 public class MoveGenerator
 {
     private static final int BOARD_SIZE = 24;
     private static final int MAX_DOUBLE_MOVES = 4;
     private static final int WHITE_HOME_START = 18;
     private static final int BLACK_HOME_END = 5;
+
+    /**
+     * Generates the individual legal moves available to a player for the supplied
+     * dice values.
+     *
+     * <p>If the player has checkers on the bar, only legal bar-entry moves are
+     * returned.
+     *
+     * @param board the current board state
+     * @param player the player making the move
+     * @param dice the dice available for the turn
+     * @return the available legal moves
+     */
 
     public List<Move> generateMoves(Board board, Player player, Dice dice)
     {
@@ -84,6 +105,22 @@ public class MoveGenerator
         return moves;
     }
 
+    /**
+     * Generates the legal move sequences available to a player for the supplied
+     * dice values.
+     *
+     * <p>For different dice values, both possible dice orders are considered. For
+     * doubles, up to four moves using the repeated die value are generated. Only
+     * sequences using the maximum possible number of dice are retained. If only
+     * one of two different dice can be played, the higher die is used when
+     * possible.
+     *
+     * @param board the current board state
+     * @param player the player making the move
+     * @param dice the dice available for the turn
+     * @return the legal move sequences available to the player
+     */
+
     public List<MoveSequence> generateMoveSequences(Board board, Player player, Dice dice)
     {
         List<MoveSequence> sequences = new ArrayList<>();
@@ -139,6 +176,16 @@ public class MoveGenerator
         return sequences;
     }
 
+    /**
+     * Generates move sequences for a specified ordering of two different dice.
+     *
+     * @param sequences the collection receiving generated sequences
+     * @param board the current board state
+     * @param player the player making the moves
+     * @param firstDie the die value to use first
+     * @param secondDie the die value to use second
+     */
+
     private void generateSequencesForOrder(List<MoveSequence> sequences, Board board,
                                            Player player, int firstDie, int secondDie)
     {
@@ -169,6 +216,17 @@ public class MoveGenerator
             }
         }
     }
+
+    /**
+     * Recursively generates legal move sequences for a double roll.
+     *
+     * @param sequences the collection receiving generated sequences
+     * @param board the current board state
+     * @param player the player making the moves
+     * @param dieValue the repeated die value
+     * @param currentSequence the sequence generated so far
+     * @param movesRemaining the maximum number of additional moves to generate
+     */
 
     private void generateDoubleSequences(List<MoveSequence> sequences, Board board,
                                          Player player, int dieValue, MoveSequence currentSequence,
@@ -204,6 +262,15 @@ public class MoveGenerator
                     movesRemaining - 1);
         }
     }
+
+    /**
+     * Generates the legal moves available for a single die value.
+     *
+     * @param board the current board state
+     * @param player the player making the move
+     * @param dieValue the die value to use
+     * @return the legal moves available for the die value
+     */
 
     private List<Move> generateMovesForDie(Board board, Player player, int dieValue)
     {
@@ -255,6 +322,16 @@ public class MoveGenerator
         return moves;
     }
 
+    /**
+     * Adds a legal bar-entry move for the supplied die value when one is
+     * available.
+     *
+     * @param moves the collection receiving the move
+     * @param board the current board state
+     * @param player the player entering from the bar
+     * @param dieValue the die value used for entry
+     */
+
     private void generateBarEntryMove(List<Move> moves, Board board, Player player, int dieValue)
     {
         int destination;
@@ -276,11 +353,37 @@ public class MoveGenerator
         }
     }
 
+    /**
+     * Determines whether a point can legally receive a checker.
+     *
+     * <p>A destination is legal if it is empty, owned by the moving player, or
+     * contains exactly one opposing checker.
+     *
+     * @param destination the destination point
+     * @param player the player making the move
+     * @return true if the destination can be moved onto, otherwise false
+     */
+
     private boolean isLegalDestination(Point destination, Player player)
     {
         return destination.isEmpty() || destination.getOwner() == player
                 || (destination.getOwner() != player && destination.getCheckerCount() == 1);
     }
+
+    /**
+     * Determines whether a checker can be borne off using the supplied die value.
+     *
+     * <p>Bearing off is only permitted when all of the player's remaining
+     * checkers are in the home board. A checker may bear off using the exact die
+     * value or, where permitted, a higher die when there are no checkers on a
+     * higher point.
+     *
+     * @param board the current board state
+     * @param player the player bearing off
+     * @param fromPoint the point containing the checker
+     * @param dieValue the die value being used
+     * @return true if the checker can legally be borne off, otherwise false
+     */
 
     private boolean canBearOff(Board board, Player player, int fromPoint, int dieValue)
     {

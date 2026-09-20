@@ -13,6 +13,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
+/**
+ * Provides the JavaFX visual representation of a Backgammon board.
+ *
+ * <p>The view draws the board, points, checkers, bar, and bear-off areas. It
+ * also displays highlighted destinations and forwards board selections to a
+ * registered click handler.
+ */
+
 public class BoardView extends Pane
 {
     public static final int WHITE_BAR = -1;
@@ -50,6 +58,12 @@ public class BoardView extends Pane
 
     private Consumer<Integer> pointClickHandler;
 
+    /**
+     * Creates a board view for the supplied board state.
+     *
+     * @param board the board state to display
+     */
+
     public BoardView(Board board)
     {
         this.board = board;
@@ -58,15 +72,31 @@ public class BoardView extends Pane
         drawBoard();
     }
 
+    /**
+     * Redraws the board using the current game state.
+     */
+
     public void refresh()
     {
         drawBoard();
     }
 
+    /**
+     * Sets the handler that receives board location selections.
+     *
+     * @param handler the handler to invoke when a board location is selected
+     */
+
     public void setOnPointClicked(Consumer<Integer> handler)
     {
         pointClickHandler = handler;
     }
+
+    /**
+     * Highlights the specified board locations as available selections.
+     *
+     * @param points the board location identifiers to highlight
+     */
 
     public void highlightPoints(Set<Integer> points)
     {
@@ -75,11 +105,19 @@ public class BoardView extends Pane
         drawBoard();
     }
 
+    /**
+     * Removes all highlighted board locations and redraws the board.
+     */
+
     public void clearHighlights()
     {
         highlightedPoints.clear();
         drawBoard();
     }
+
+    /**
+     * Redraws all visual components of the Backgammon board.
+     */
 
     private void drawBoard()
     {
@@ -303,6 +341,16 @@ public class BoardView extends Pane
     {
         return pointIndex >= HALF_BOARD_SIZE;
     }
+
+    /**
+     * Calculates the horizontal display position of a board point.
+     *
+     * <p>The calculation accounts for the four groups of six points and the
+     * central bar separating the two halves of the board.
+     *
+     * @param pointIndex the index of the board point
+     * @return the horizontal coordinate of the point
+     */
 
     private double getPointX(int pointIndex)
     {

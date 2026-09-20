@@ -9,6 +9,17 @@ import game.Player;
 
 import java.util.List;
 
+/**
+ * Implements an AI player that selects moves using Expectimax search.
+ *
+ * <p>The search models future dice rolls as chance outcomes and future move
+ * choices as decision nodes. The original player attempts to maximise the
+ * evaluation score, while the opponent attempts to minimise it. A node budget
+ * limits the amount of search performed, with heuristic board evaluation used
+ * when further search cannot be completed.
+ */
+
+
 public class ExpectimaxAi implements AiPlayer
 {
     private static final int DIE_SIDES = 6;
@@ -26,15 +37,36 @@ public class ExpectimaxAi implements AiPlayer
     private int nodesEvaluated;
     private boolean budgetReached;
 
+    /**
+     * Creates an Expectimax AI using the default search depth and node budget.
+     */
+
     public ExpectimaxAi()
     {
         this(DEFAULT_SEARCH_DEPTH, DEFAULT_NODE_BUDGET);
     }
 
+    /**
+     * Creates an Expectimax AI using the specified search depth and the default
+     * node budget.
+     *
+     * @param searchDepth the number of future decision levels to search
+     * @throws IllegalArgumentException if the search depth is less than one
+     */
+
     public ExpectimaxAi(int searchDepth)
     {
         this(searchDepth, DEFAULT_NODE_BUDGET);
     }
+
+    /**
+     * Creates an Expectimax AI using the specified search depth and node budget.
+     *
+     * @param searchDepth the number of future decision levels to search
+     * @param nodeBudget the computational budget allocated to each root move
+     * @throws IllegalArgumentException if the search depth is less than one
+     * @throws IllegalArgumentException if the node budget is less than one
+     */
 
     public ExpectimaxAi(int searchDepth, int nodeBudget)
     {
@@ -54,6 +86,20 @@ public class ExpectimaxAi implements AiPlayer
         this.searchDepth = searchDepth;
         this.nodeBudget = nodeBudget;
     }
+
+    /**
+     * Selects the legal move sequence with the highest expected score according
+     * to the configured Expectimax search.
+     *
+     * <p>Each legal root sequence is applied to a copy of the board before future
+     * dice outcomes and move decisions are explored.
+     *
+     * @param board the current board state
+     * @param player the player making the move
+     * @param dice the dice available for the turn
+     * @return the highest-rated legal move sequence, or an empty sequence if no
+     *         legal moves are available
+     */
 
     @Override
     public MoveSequence chooseMove(Board board, Player player, Dice dice)
@@ -92,25 +138,67 @@ public class ExpectimaxAi implements AiPlayer
         return bestSequence;
     }
 
+    /**
+     * Returns the number of decision nodes evaluated during the most recent
+     * move selection.
+     *
+     * @return the number of evaluated decision nodes
+     */
+
     public int getNodesEvaluated()
     {
         return nodesEvaluated;
     }
+
+    /**
+     * Returns the configured search depth.
+     *
+     * @return the search depth
+     */
 
     public int getSearchDepth()
     {
         return searchDepth;
     }
 
+    /**
+     * Returns the configured node budget used for each root move.
+     *
+     * @return the node budget
+     */
+
     public int getNodeBudget()
     {
         return nodeBudget;
     }
 
+    /**
+     * Indicates whether the node budget limited any part of the most recent
+     * search.
+     *
+     * @return true if the budget caused heuristic evaluation to be used before
+     *         the configured search depth was completed, otherwise false
+     */
+
     public boolean wasBudgetReached()
     {
         return budgetReached;
     }
+
+    /**
+     * Calculates the expected score across all possible dice outcomes.
+     *
+     * <p>The available budget is divided equally across the possible ordered dice
+     * outcomes. If the search depth or available budget is exhausted, the current
+     * board state is evaluated heuristically.
+     *
+     * @param board the board state being searched
+     * @param currentPlayer the player whose turn is being considered
+     * @param originalPlayer the player for whom the root move is being evaluated
+     * @param depthRemaining the remaining search depth
+     * @param budgetRemaining the remaining node budget for this branch
+     * @return the expected evaluation score across the possible dice outcomes
+     */
 
     private double calculateExpectedScore(Board board, Player currentPlayer, Player originalPlayer,
                                           int depthRemaining, int budgetRemaining)
@@ -149,6 +237,22 @@ public class ExpectimaxAi implements AiPlayer
         return totalScore / DICE_OUTCOMES;
     }
 
+    /**
+     * Calculates the score of a decision node for a particular dice outcome.
+     *
+     * <p>The original player selects the maximum available score, while the
+     * opponent selects the minimum. If no legal move is available, play passes
+     * to the opposing player.
+     *
+     * @param board the board state being searched
+     * @param currentPlayer the player making the decision
+     * @param originalPlayer the player for whom the root move is being evaluated
+     * @param dice the dice available at this decision node
+     * @param depthRemaining the remaining search depth
+     * @param budgetRemaining the remaining node budget for this branch
+     * @return the resulting score for the decision node
+     */
+
     private double calculateDecisionScore(Board board, Player currentPlayer, Player originalPlayer,
                                           Dice dice, int depthRemaining, int budgetRemaining)
     {
@@ -180,6 +284,21 @@ public class ExpectimaxAi implements AiPlayer
         return findMinimumScore(board, currentPlayer, originalPlayer, legalSequences,
                 depthRemaining, remainingBudget);
     }
+
+    /**
+     * Finds the highest score available to the original player.
+     *
+     * <p>The remaining budget is divided between the available legal move
+     * sequences before each resulting board state is explored.
+     *
+     * @param board the current board state
+     * @param currentPlayer the player making the move
+     * @param originalPlayer the player for whom the root move is being evaluated
+     * @param legalSequences the legal move sequences available
+     * @param depthRemaining the remaining search depth
+     * @param budgetRemaining the remaining node budget
+     * @return the highest score found
+     */
 
     private double findMaximumScore(Board board, Player currentPlayer, Player originalPlayer,
                                     List<MoveSequence> legalSequences, int depthRemaining,
@@ -217,6 +336,21 @@ public class ExpectimaxAi implements AiPlayer
 
         return bestScore;
     }
+
+    /**
+     * Finds the lowest score available to the opponent of the original player.
+     *
+     * <p>The remaining budget is divided between the available legal move
+     * sequences before each resulting board state is explored.
+     *
+     * @param board the current board state
+     * @param currentPlayer the player making the move
+     * @param originalPlayer the player for whom the root move is being evaluated
+     * @param legalSequences the legal move sequences available
+     * @param depthRemaining the remaining search depth
+     * @param budgetRemaining the remaining node budget
+     * @return the lowest score found
+     */
 
     private double findMinimumScore(Board board, Player currentPlayer, Player originalPlayer,
                                     List<MoveSequence> legalSequences, int depthRemaining,

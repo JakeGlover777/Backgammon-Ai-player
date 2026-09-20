@@ -1,5 +1,13 @@
 package game;
 
+/**
+ * Represents a single checker move in Backgammon.
+ *
+ * <p>A move may represent movement between two board points, bearing a checker
+ * off the board, or entering a checker from the bar. The move also records the
+ * die value used.
+ */
+
 public class Move
 {
     private static final int BAR = -1;
@@ -12,6 +20,15 @@ public class Move
     private final boolean bearingOff;
     private final boolean enteringFromBar;
 
+    /**
+     * Creates a move between two points on the board.
+     *
+     * @param player the player making the move
+     * @param fromPoint the point the checker moves from
+     * @param toPoint the point the checker moves to
+     * @param dieValue the die value used for the move
+     */
+
     public Move(Player player, int fromPoint, int toPoint, int dieValue)
     {
         this.player = player;
@@ -22,6 +39,14 @@ public class Move
         this.enteringFromBar = false;
     }
 
+    /**
+     * Creates a move that bears a checker off the board.
+     *
+     * @param player the player making the move
+     * @param fromPoint the point the checker is borne off from
+     * @param dieValue the die value used for the move
+     */
+
     public Move(Player player, int fromPoint, int dieValue)
     {
         this.player = player;
@@ -31,6 +56,16 @@ public class Move
         this.bearingOff = true;
         this.enteringFromBar = false;
     }
+
+    /**
+     * Creates a move that enters a checker from the bar.
+     *
+     * @param player the player making the move
+     * @param toPoint the point the checker enters onto
+     * @param dieValue the die value used for the move
+     * @param enteringFromBar must be true to indicate a bar-entry move
+     * @throws IllegalArgumentException if enteringFromBar is false
+     */
 
     public Move(Player player, int toPoint, int dieValue, boolean enteringFromBar)
     {
@@ -47,35 +82,77 @@ public class Move
         this.enteringFromBar = true;
     }
 
+    /**
+     * Returns the player making this move.
+     *
+     * @return the player making the move
+     */
+
     public Player getPlayer()
     {
         return player;
     }
+
+    /**
+     * Returns the point the checker moves from.
+     *
+     * @return the source point
+     */
 
     public int getFromPoint()
     {
         return fromPoint;
     }
 
+    /**
+     * Returns the point the checker moves to.
+     *
+     * @return the destination point
+     */
+
     public int getToPoint()
     {
         return toPoint;
     }
+
+    /**
+     * Returns the die value used for this move.
+     *
+     * @return the die value
+     */
 
     public int getDieValue()
     {
         return dieValue;
     }
 
+    /**
+     * Determines whether this move bears a checker off the board.
+     *
+     * @return true if the move is a bearing-off move, otherwise false
+     */
+
     public boolean isBearingOff()
     {
         return bearingOff;
     }
 
+    /**
+     * Determines whether this move enters a checker from the bar.
+     *
+     * @return true if the move is a bar-entry move, otherwise false
+     */
+
     public boolean isEnteringFromBar()
     {
         return enteringFromBar;
     }
+
+    /**
+     * Returns a textual representation of this move.
+     *
+     * @return the move as a string
+     */
 
     @Override
     public String toString()

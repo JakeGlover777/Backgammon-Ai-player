@@ -1,5 +1,14 @@
 package game;
 
+/**
+ * Represents the state of a Backgammon board.
+ *
+ * <p>The board contains the 24 playable points and tracks the number of
+ * checkers on the bar and borne off for each player. A board can be created
+ * using the standard starting position, as an empty board, or as a copy of
+ * another board.
+ */
+
 public class Board
 {
     private static final int BOARD_SIZE = 24;
@@ -31,10 +40,21 @@ public class Board
     private int whiteCheckersOnBar;
     private int blackCheckersOnBar;
 
+    /**
+     * Creates a board using the standard Backgammon starting position.
+     */
+
     public Board()
     {
         this(true);
     }
+
+    /**
+     * Creates a board and optionally sets up the standard starting position.
+     *
+     * @param useStartingPosition whether the board should use the standard
+     *                            starting position
+     */
 
     public Board(boolean useStartingPosition)
     {
@@ -56,6 +76,12 @@ public class Board
         }
     }
 
+    /**
+     * Creates a deep copy of another board.
+     *
+     * @param other the board to copy
+     */
+
     public Board(Board other)
     {
         points = new Point[BOARD_SIZE];
@@ -71,6 +97,14 @@ public class Board
         blackCheckersOnBar = other.blackCheckersOnBar;
     }
 
+    /**
+     * Returns the point at the specified board index.
+     *
+     * @param index the zero-based index of the point
+     * @return the point at the specified index
+     * @throws IllegalArgumentException if the index is outside the board
+     */
+
     public Point getPoint(int index)
     {
         if (index < 0 || index >= BOARD_SIZE)
@@ -81,6 +115,14 @@ public class Board
 
         return points[index];
     }
+
+    /**
+     * Returns the number of checkers the specified player has on the bar.
+     *
+     * @param player the player whose bar count is required
+     * @return the number of checkers on the bar
+     * @throws IllegalArgumentException if the player is not WHITE or BLACK
+     */
 
     public int getBarCount(Player player)
     {
@@ -97,6 +139,14 @@ public class Board
         throw new IllegalArgumentException("Player must be WHITE or BLACK.");
     }
 
+    /**
+     * Returns the number of checkers the specified player has borne off.
+     *
+     * @param player the player whose borne-off count is required
+     * @return the number of borne-off checkers
+     * @throws IllegalArgumentException if the player is not WHITE or BLACK
+     */
+
     public int getBorneOffCount(Player player)
     {
         if (player == Player.WHITE)
@@ -111,6 +161,16 @@ public class Board
 
         throw new IllegalArgumentException("Player must be WHITE or BLACK.");
     }
+
+    /**
+     * Determines whether all remaining checkers for the specified player are
+     * within that player's home board.
+     *
+     * @param player the player to check
+     * @return true if all remaining checkers are in the home board and none are
+     *         on the bar, otherwise false
+     * @throws IllegalArgumentException if the player is not WHITE or BLACK
+     */
 
     public boolean allCheckersInHomeBoard(Player player)
     {
@@ -148,6 +208,14 @@ public class Board
         throw new IllegalArgumentException("Player must be WHITE or BLACK.");
     }
 
+    /**
+     * Removes one of the specified player's checkers from the bar.
+     *
+     * @param player the player whose checker is removed
+     * @throws IllegalStateException if the player has no checkers on the bar
+     * @throws IllegalArgumentException if the player is not WHITE or BLACK
+     */
+
     public void removeFromBar(Player player)
     {
         if (player == Player.WHITE)
@@ -174,6 +242,16 @@ public class Board
 
         throw new IllegalArgumentException("Player must be WHITE or BLACK.");
     }
+
+    /**
+     * Applies a move to the current board state.
+     *
+     * <p>The method updates the source and destination points as required and
+     * handles entering from the bar, bearing off, and sending an opposing blot
+     * to the bar.
+     *
+     * @param move the move to apply
+     */
 
     public void applyMove(Move move)
     {

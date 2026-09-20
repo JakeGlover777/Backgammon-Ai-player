@@ -11,6 +11,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+/**
+ * Manages move selection during a human player's turn.
+ *
+ * <p>The controller tracks the legal move sequences available for the turn,
+ * processes board selections, highlights legal destinations, and narrows the
+ * remaining sequences as individual moves are selected.
+ */
+
 public class HumanTurnController
 {
     private final Board board;
@@ -21,6 +29,15 @@ public class HumanTurnController
     private Integer selectedPoint;
     private List<MoveSequence> remainingSequences;
     private int moveIndex;
+
+    /**
+     * Creates a human turn controller for the supplied board and view.
+     *
+     * @param board the board containing the current game state
+     * @param boardView the view used to display and highlight board positions
+     * @param instructionUpdater updates the instructions displayed to the player
+     * @param moveHandler handles a legal move selected by the player
+     */
 
     public HumanTurnController(Board board, BoardView boardView, Consumer<String> instructionUpdater,
                                Consumer<Move> moveHandler)
@@ -34,6 +51,15 @@ public class HumanTurnController
         remainingSequences = null;
         moveIndex = 0;
     }
+
+    /**
+     * Starts a human turn using the supplied legal move sequences.
+     *
+     * <p>The current selection state is reset and the player is prompted either
+     * to select a checker or to enter a checker from the bar.
+     *
+     * @param sequences the legal move sequences available for the turn
+     */
 
     public void startTurn(List<MoveSequence> sequences)
     {
@@ -52,6 +78,16 @@ public class HumanTurnController
             instructionUpdater.accept("Select a checker.");
         }
     }
+
+    /**
+     * Processes a board location selected by the human player.
+     *
+     * <p>The selection is handled as either a bar-entry interaction or a normal
+     * checker movement depending on the currently available legal sequences.
+     *
+     * @param pointIndex the index of the selected board location
+     * @param currentPlayer the player taking the current turn
+     */
 
     public void handleBoardClick(int pointIndex, Player currentPlayer)
     {
@@ -171,6 +207,16 @@ public class HumanTurnController
         instructionUpdater.accept("Select a highlighted destination.");
     }
 
+    /**
+     * Records a move selected during the current human turn.
+     *
+     * <p>The remaining legal sequences are filtered to those containing the
+     * selected move at the current position, before advancing to the next move
+     * in the sequence.
+     *
+     * @param selectedMove the move selected by the player
+     */
+
     public void recordMove(Move selectedMove)
     {
         filterSequences(selectedMove);
@@ -178,6 +224,13 @@ public class HumanTurnController
         moveIndex++;
         selectedPoint = null;
     }
+
+    /**
+     * Determines whether the next move in any remaining legal sequence requires
+     * a checker to enter from the bar.
+     *
+     * @return true if the current move requires bar entry, otherwise false
+     */
 
     public boolean currentMoveRequiresBarEntry()
     {
@@ -204,6 +257,13 @@ public class HumanTurnController
         return false;
     }
 
+    /**
+     * Determines whether all moves in the current human turn have been completed.
+     *
+     * @return true if no remaining legal sequence contains another move,
+     *         otherwise false
+     */
+
     public boolean turnIsComplete()
     {
         for (MoveSequence sequence : remainingSequences)
@@ -217,6 +277,10 @@ public class HumanTurnController
         return true;
     }
 
+    /**
+     * Resets the human turn state and clears any highlighted board locations.
+     */
+
     public void reset()
     {
         selectedPoint = null;
@@ -225,6 +289,17 @@ public class HumanTurnController
 
         boardView.clearHighlights();
     }
+
+    /**
+     * Finds the legal destinations for a checker at the specified point based on
+     * the remaining move sequences.
+     *
+     * <p>Bearing-off moves are converted to the corresponding board-view
+     * destination so they can be selected through the interface.
+     *
+     * @param fromPoint the point containing the selected checker
+     * @return the legal destination indices for the selected checker
+     */
 
     private Set<Integer> findDestinations(int fromPoint)
     {
@@ -342,6 +417,13 @@ public class HumanTurnController
         return null;
     }
 
+    /**
+     * Filters the remaining legal sequences to those that contain the selected
+     * move at the current move position.
+     *
+     * @param selectedMove the move selected by the human player
+     */
+
     private void filterSequences(Move selectedMove)
     {
         List<MoveSequence> filtered = new ArrayList<>();
@@ -363,6 +445,17 @@ public class HumanTurnController
 
         remainingSequences = filtered;
     }
+
+    /**
+     * Determines whether two moves represent the same playable action.
+     *
+     * <p>The comparison accounts for bar entry, bearing off, die value, source
+     * point, and destination point as applicable to the move type.
+     *
+     * @param first the first move to compare
+     * @param second the second move to compare
+     * @return true if the moves represent the same action, otherwise false
+     */
 
     private boolean movesMatch(Move first, Move second)
     {

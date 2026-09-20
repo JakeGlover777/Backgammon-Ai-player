@@ -10,6 +10,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Exports recorded experimental statistics to CSV files.
+ *
+ * <p>Game-level statistics are written to a games file, while individual
+ * decision statistics are written to a separate decisions file.
+ */
+
 public class ExperimentCsvExporter
 {
     private static final String GAME_HEADER =
@@ -20,6 +27,18 @@ public class ExperimentCsvExporter
                     + "decision_time_ns,nodes_evaluated,search_depth,"
                     + "node_budget,budget_reached";
 
+    /**
+     * Exports the recorded experiment statistics to CSV files in the specified
+     * output directory.
+     *
+     * <p>The output directory is created if necessary. Game statistics are
+     * written to games.csv and decision statistics are written to decisions.csv.
+     *
+     * @param statisticsRecorder the recorded experiment statistics to export
+     * @param outputDirectory the directory in which the CSV files are created
+     * @throws IOException if an error occurs while creating or writing the files
+     */
+
     public void export(StatisticsRecorder statisticsRecorder, Path outputDirectory)
             throws IOException
     {
@@ -29,6 +48,14 @@ public class ExperimentCsvExporter
 
         exportDecisions(statisticsRecorder, outputDirectory.resolve("decisions.csv"));
     }
+
+    /**
+     * Writes the recorded game-level statistics to a CSV file.
+     *
+     * @param statisticsRecorder the recorded experiment statistics
+     * @param outputPath the path of the game statistics CSV file
+     * @throws IOException if an error occurs while writing the file
+     */
 
     private void exportGames(StatisticsRecorder statisticsRecorder, Path outputPath)
             throws IOException
@@ -45,6 +72,14 @@ public class ExperimentCsvExporter
             }
         }
     }
+
+    /**
+     * Writes the recorded decision-level statistics to a CSV file.
+     *
+     * @param statisticsRecorder the recorded experiment statistics
+     * @param outputPath the path of the decision statistics CSV file
+     * @throws IOException if an error occurs while writing the file
+     */
 
     private void exportDecisions(StatisticsRecorder statisticsRecorder, Path outputPath)
             throws IOException

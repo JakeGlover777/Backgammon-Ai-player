@@ -6,13 +6,11 @@ import statistics
 import matplotlib.pyplot as plt
 from scipy.stats import binomtest, linregress, norm, pearsonr
 
-
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ROOT = PROJECT_ROOT / "experiment-output" / "final"
 OUTPUT = PROJECT_ROOT / "analysis-output" / "final"
 
 OUTPUT.mkdir(exist_ok=True)
-
 
 EXPERIMENTS = {
     "Random vs Heuristic":
@@ -34,11 +32,9 @@ EXPERIMENTS = {
         "expectimax_ai-vs-heuristic_ai-depth-1-budget-1000000000-2026-08-31_02-03-00",
 }
 
-
 def read_csv(path):
     with path.open(newline="", encoding="utf-8-sig") as file:
         return list(csv.DictReader(file))
-
 
 def wilson_interval(wins, games, z=1.959963984540054):
     win_rate = wins / games
@@ -61,7 +57,6 @@ def wilson_interval(wins, games, z=1.959963984540054):
 
     return centre - half_width, centre + half_width
 
-
 def percentile(values, percentile_value):
     values = sorted(values)
 
@@ -78,7 +73,6 @@ def percentile(values, percentile_value):
         + values[upper] * (position - lower)
     )
 
-
 def get_winner_ai(game):
     if game["winner"] == "WHITE":
         return game["white_ai"]
@@ -87,7 +81,6 @@ def get_winner_ai(game):
         return game["black_ai"]
 
     return None
-
 
 def analyse_experiment(name, folder_name):
     folder = ROOT / folder_name
@@ -233,7 +226,6 @@ def analyse_experiment(name, folder_name):
         "black": colour_results["BLACK"],
     }
 
-
 def compare_proportions(first, second):
     pooled_rate = (first["wins"] + second["wins"]) / (first["games"] + second["games"])
 
@@ -257,7 +249,6 @@ def compare_proportions(first, second):
 
     return z_score, p_value
 
-
 def prepare_axis(axis):
     axis.spines["top"].set_visible(False)
     axis.spines["right"].set_visible(False)
@@ -270,7 +261,6 @@ def prepare_axis(axis):
 
     axis.set_axisbelow(True)
 
-
 def save_figure(figure, filename):
     figure.tight_layout()
 
@@ -281,7 +271,6 @@ def save_figure(figure, filename):
     )
 
     plt.close(figure)
-
 
 def print_results(results):
     for result in results:
@@ -356,7 +345,6 @@ def print_results(results):
             f'{result["black"]["games"]} '
             f'({result["black"]["win_rate"] * 100:.2f}%)'
         )
-
 
 def create_win_rate_figure(expectimax_results):
     labels = [
@@ -434,7 +422,6 @@ def create_win_rate_figure(expectimax_results):
         figure,
         "figure_1_expectimax_win_rate.png"
     )
-
 
 def create_node_figure(expectimax_results):
     labels = [
@@ -527,7 +514,6 @@ def create_node_figure(expectimax_results):
         "figure_2_expectimax_nodes.png"
     )
 
-
 def create_time_figure(expectimax_results):
     labels = [
         result["name"]
@@ -619,7 +605,6 @@ def create_time_figure(expectimax_results):
         "figure_3_expectimax_decision_time.png"
     )
 
-
 def create_colour_figure(expectimax_results):
     labels = [
         result["name"]
@@ -703,7 +688,6 @@ def create_colour_figure(expectimax_results):
         figure,
         "figure_4_expectimax_colour.png"
     )
-
 
 def create_nodes_vs_time_figure(expectimax_results):
     pairs = []
@@ -850,7 +834,6 @@ def create_nodes_vs_time_figure(expectimax_results):
         regression.pvalue
     )
 
-
 def get_depth_two_results(results):
     names = (
         "Depth 2 / 1k",
@@ -866,7 +849,6 @@ def get_depth_two_results(results):
         )
         for name in names
     ]
-
 
 def create_budget_vs_cost_figure(depth_two_results):
     budgets = [
@@ -916,7 +898,6 @@ def create_budget_vs_cost_figure(depth_two_results):
         figure,
         "figure_6_budget_vs_cost.png"
     )
-
 
 def create_budget_vs_win_rate_figure(
         depth_two_results):
@@ -997,7 +978,6 @@ def create_budget_vs_win_rate_figure(
         "figure_7_budget_vs_win_rate.png"
     )
 
-
 def export_summary_csv(results):
     output_path = (
         OUTPUT
@@ -1049,7 +1029,6 @@ def export_summary_csv(results):
                 result["white"]["win_rate"],
                 result["black"]["win_rate"],
             ])
-
 
 def main():
     results = [
@@ -1173,7 +1152,6 @@ def main():
         "Analysis complete. "
         "Files saved to analysis-output/"
     )
-
 
 if __name__ == "__main__":
     main()
