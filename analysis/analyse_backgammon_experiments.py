@@ -1,3 +1,15 @@
+"""
+Experimental analysis script for the Backgammon AI dissertation.
+
+This script was developed with assistance from OpenAI ChatGPT.
+ChatGPT was used to assist with generating and refining the statistical
+analysis and visualisation code. The generated code and outputs were reviewed
+by the author before use.
+
+Full details of generative AI use are provided in the dissertation's
+Generative AI Use Declaration.
+"""
+
 from pathlib import Path
 import csv
 import math
